@@ -1,0 +1,19 @@
+{
+  "name": "home-care-agent-kit",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Genesys Cloud Functions (Node 22) for Home Care booking flows",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "sync": "node scripts/sync-lib.js",
+    "zip": "bash scripts/build-zips.sh",
+    "verify:zip": "node scripts/verify-genesys-zips.js",
+    "test:smoke": "node scripts/sync-lib.js && node scripts/local-smoke.js",
+    "test:add-booking": "node scripts/sync-lib.js && node scripts/test-add-booking-payloads.js",
+    "test:cloud-store": "node scripts/sync-lib.js && node scripts/test-cloud-store-path.js",
+    "test:genesys-store-add-idv": "node scripts/sync-lib.js && node scripts/test-genesys-shared-store-add-idv.js",
+    "demo:dashboard": "cd web-roster-dashboard && npm install && node server.js"
+  }
+}

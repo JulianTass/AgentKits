@@ -1,0 +1,60 @@
+{
+  "name": "hc-add-new-booking",
+  "description": "Creates confirmed bookings for all Independent Living Maintenance Plan services for the week of the requested appointment anchor.",
+  "handler": "handler.handler",
+  "runtime": "nodejs_22.x",
+  "input": {
+    "type": "object",
+    "required": ["fullName", "dob", "phone"],
+    "properties": {
+      "fullName": { "type": "string", "description": "Customer full name. Aliases accepted: name, customerName, full_name, FullName, Name (Genesys script casing)." },
+      "dob": { "type": "string", "description": "Date of birth dd/mm/yyyy or yyyy-mm-dd" },
+      "phone": { "type": "string", "description": "Phone number (any common format)" },
+      "scheduledStart": {
+        "type": "string",
+        "description": "Anchor date and time: dd/mm/yyyy T HH:mm (e.g. 29/04/2026T11:00:00) or ISO 2026-04-29T11:00:00"
+      },
+      "appointmentDate": {
+        "type": "string",
+        "description": "dd/mm/yyyy or yyyy-mm-dd when scheduledStart is not supplied"
+      },
+      "appointmentTime": {
+        "type": "string",
+        "description": "HH:mm or HH:mm:ss when scheduledStart is not supplied"
+      },
+      "storePath": {
+        "type": "string",
+        "description": "Optional override path to bookings JSON for local testing"
+      }
+    }
+  },
+  "output": {
+    "type": "object",
+    "properties": {
+      "success": { "type": "boolean" },
+      "clientId": { "type": "string" },
+      "fullName": { "type": "string", "description": "Echo for Genesys templates (use JSONPath $.fullName)" },
+      "dob": { "type": "string", "description": "DOB dd/mm/yyyy echo" },
+      "dobIso": { "type": "string" },
+      "phone": { "type": "string", "description": "Digits-only echo" },
+      "startschedule": { "type": "string", "description": "First service scheduledStart (ISO datetime)" },
+      "appointmentDate": { "type": "string", "description": "yyyy-mm-dd from first booking" },
+      "appointmentTime": { "type": "string", "description": "HH:mm from first booking" },
+      "bookingGroupId": { "type": "string" },
+      "bookingId": {
+        "type": "string",
+        "description": "Generated primary booking reference (e.g. BK456); same as the first row in bookingIds"
+      },
+      "primaryBookingReference": {
+        "type": "string",
+        "description": "Alias of bookingId for backwards compatibility"
+      },
+      "bookingIds": { "type": "array", "items": { "type": "string" } },
+      "planName": { "type": "string" },
+      "servicesBooked": { "type": "array" },
+      "message": { "type": "string" },
+      "error": { "type": "string" },
+      "code": { "type": "string" }
+    }
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "meta": {
+    "lastClaimSeq": 1001,
+    "lastClaimantSeq": 203
+  },
+  "claimants": [
+    {
+      "claimantId": "MEM-201",
+      "fullName": "Seed Member",
+      "dob": "1989-02-14",
+      "memberId": "WF-SEED-001",
+      "policy": "Gold Ultimate Hospital"
+    },
+    {
+      "claimantId": "MEM-202",
+      "fullName": "Sarah Johnson",
+      "dob": "1991-04-11",
+      "memberId": "MID432",
+      "policy": "Gold Ultimate Hospital"
+    },
+    {
+      "claimantId": "MEM-203",
+      "fullName": "Liam Carter",
+      "dob": "1987-09-23",
+      "memberId": "MID947",
+      "policy": "Gold Ultimate Hospital"
+    }
+  ],
+  "claims": [
+    {
+      "claimNumber": "CLM1001",
+      "claimType": "Extras",
+      "serviceType": "Dental",
+      "providerName": "Seed Dental",
+      "providerId": "PRV-001",
+      "dateOfService": "2026-04-10",
+      "descriptionOfTreatment": "Initial consultation",
+      "claimAmount": 95.5,
+      "itemNumbers": [
+        "011"
+      ],
+      "claimantId": "MEM-201",
+      "status": "submitted",
+      "createdAt": "2026-04-11T09:00:00.000Z"
+    }
+  ]
+}

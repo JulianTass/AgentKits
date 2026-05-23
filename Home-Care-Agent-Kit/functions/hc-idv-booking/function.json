@@ -1,0 +1,45 @@
+{
+  "name": "hc-idv-booking",
+  "description": "Identity verification anchor: resolves the customer using any one of booking/group reference, phone, or DOB (dd/mm/yyyy) when unique; returns clientId, plan context, and bookings for the requested week.",
+  "handler": "handler.handler",
+  "runtime": "nodejs_22.x",
+  "input": {
+    "type": "object",
+    "properties": {
+      "phone": {
+        "type": "string",
+        "description": "Optional when bookingReference or dob uniquely identifies the customer. Aliases: Phone, Mobile, phoneNumber, CallerPhone, ANI"
+      },
+      "dob": {
+        "type": "string",
+        "description": "Date of birth dd/mm/yyyy or yyyy-mm-dd (optional). Aliases: Dob, DOB, dateOfBirth, birthDate"
+      },
+      "bookingReference": {
+        "type": "string",
+        "description": "Any BK### booking id or GRP### group id. Aliases: BookingReference, bookingId, BookingId, bookingRef, bookingNumber, reference, groupId, bookingGroupId"
+      },
+      "weekStart": {
+        "type": "string",
+        "description": "Monday date for the roster week: dd/mm/yyyy or yyyy-mm-dd (optional). Aliases: WeekStart, rosterWeekStart"
+      },
+      "referenceDate": {
+        "type": "string",
+        "description": "Any date inside the week when weekStart is omitted. Aliases: ReferenceDate, asAtDate, weekReferenceDate"
+      },
+      "storePath": { "type": "string" }
+    }
+  },
+  "output": {
+    "type": "object",
+    "properties": {
+      "success": { "type": "boolean" },
+      "idvStatus": { "type": "string" },
+      "clientId": { "type": "string" },
+      "planName": { "type": "string" },
+      "planServices": { "type": "array", "items": { "type": "string" } },
+      "bookingsThisWeek": { "type": "array" },
+      "error": { "type": "string" },
+      "code": { "type": "string" }
+    }
+  }
+}

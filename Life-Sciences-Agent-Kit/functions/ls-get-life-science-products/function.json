@@ -1,0 +1,40 @@
+{
+  "name": "ls-get-life-science-products",
+  "description": "Returns life sciences IV fluid products with stock levels and AUD pricing (per bag and per case). With productName and quantity, returns line price—for example 6 bags of Normal Saline. No separate pricing API required.",
+  "handler": "handler.handler",
+  "runtime": "nodejs_22.x",
+  "input": {
+    "type": "object",
+    "properties": {
+      "productName": {
+        "type": "string",
+        "description": "Product name or alias (Normal Saline, D5LR, saline, product 1). Aliases: product, search, query, productId."
+      },
+      "quantity": {
+        "type": "number",
+        "description": "Requested quantity for availability check. Aliases: qty."
+      },
+      "unit": {
+        "type": "string",
+        "description": "case, cases, bag, or bags. Defaults to bag when omitted."
+      },
+      "storePath": { "type": "string" }
+    }
+  },
+  "output": {
+    "type": "object",
+    "properties": {
+      "success": { "type": "boolean" },
+      "products": { "type": "array" },
+      "matchedProduct": { "type": "object" },
+      "availabilityCheck": { "type": "object" },
+      "lowStockProducts": { "type": "array" },
+      "canFulfill": { "type": "boolean" },
+      "lowStock": { "type": "boolean" },
+      "pricing": { "type": "object" },
+      "message": { "type": "string" },
+      "error": { "type": "string" },
+      "code": { "type": "string" }
+    }
+  }
+}

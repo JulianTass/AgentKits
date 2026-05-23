@@ -1,0 +1,59 @@
+{
+  "name": "cm-capture-claim",
+  "description": "Captures insurance claim details and creates a random claim reference number for Westfund claim intake. When details are missing, generic claim values are auto-filled.",
+  "handler": "handler.handler",
+  "runtime": "nodejs_22.x",
+  "input": {
+    "type": "object",
+    "properties": {
+      "claimantId": { "type": "string", "description": "Preferred claimant id from cm-idv-claimant; memberId and policy are then inherited from that claimant." },
+      "claimType": { "type": "string", "description": "Hospital or Extras (alias: ClaimType)." },
+      "serviceType": { "type": "string", "description": "Optional service type (defaults to Generic Service)." },
+      "providerName": { "type": "string", "description": "Optional provider name (defaults to Generic Provider)." },
+      "providerId": { "type": "string", "description": "Optional provider identifier (defaults to PRV-GENERIC)." },
+      "dateOfService": { "type": "string", "description": "dd/mm/yyyy, yyyy-mm-dd, or natural text like '11th of April 2026'." },
+      "descriptionOfTreatment": { "type": "string", "description": "Optional treatment description; generic text is used when omitted." },
+      "claimAmount": { "type": "number", "description": "Optional claim amount; random demo amount is generated when omitted." },
+      "itemNumbers": {
+        "type": "array",
+        "items": { "type": "string" },
+        "description": "Extras item numbers; also accepts comma-separated string. Defaults to ['000'] for Extras if omitted."
+      },
+      "claims": {
+        "type": "array",
+        "description": "Optional multi-claim submission. Each item can include claimType, serviceType, providerName, providerId, dateOfService, descriptionOfTreatment, claimAmount, itemNumbers.",
+        "items": { "type": "object" }
+      },
+      "fullName": { "type": "string", "description": "Optional fallback to identify claimant when claimantId is absent." },
+      "dob": { "type": "string", "description": "Optional fallback DOB." },
+      "memberId": { "type": "string", "description": "Fallback member id. Required when claimantId is not provided." },
+      "policy": { "type": "string", "description": "Optional policy name; carried from IDV when available." },
+      "storePath": { "type": "string" }
+    }
+  },
+  "output": {
+    "type": "object",
+    "properties": {
+      "success": { "type": "boolean" },
+      "claimNumber": { "type": "string" },
+      "claimNumbers": { "type": "array", "items": { "type": "string" } },
+      "claimsSubmitted": { "type": "array" },
+      "claimantId": { "type": "string" },
+      "memberId": { "type": "string" },
+      "policy": { "type": "string" },
+      "claimType": { "type": "string" },
+      "serviceType": { "type": "string" },
+      "providerName": { "type": "string" },
+      "providerId": { "type": "string" },
+      "dateOfService": { "type": "string", "description": "Date in dd/mm/yyyy format." },
+      "dateOfServiceIso": { "type": "string", "description": "ISO yyyy-mm-dd companion field." },
+      "descriptionOfTreatment": { "type": "string" },
+      "claimAmount": { "type": "number" },
+      "itemNumbers": { "type": "array", "items": { "type": "string" } },
+      "status": { "type": "string" },
+      "message": { "type": "string" },
+      "error": { "type": "string" },
+      "code": { "type": "string" }
+    }
+  }
+}

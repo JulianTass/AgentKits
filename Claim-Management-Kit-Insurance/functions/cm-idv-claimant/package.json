@@ -1,0 +1,9 @@
+{
+  "name": "cm-idv-claimant",
+  "version": "1.0.0",
+  "private": true,
+  "main": "handler.js",
+  "engines": {
+    "node": ">=22"
+  }
+}

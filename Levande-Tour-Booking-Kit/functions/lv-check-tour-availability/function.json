@@ -1,0 +1,40 @@
+{
+  "name": "lv-check-tour-availability",
+  "description": "Check tour times. villageName is optional — omitted uses LEVANDE_DEFAULT_VILLAGE_NAME if set, otherwise the first village in the store. tourDate/tourTime or tourDates/tourTimes. Optional storePath.",
+  "handler": "handler.handler",
+  "runtime": "nodejs_22.x",
+  "input": {
+    "type": "object",
+    "properties": {
+      "villageName": {
+        "type": "string",
+        "description": "Optional. Lincoln, Waratah, or Maybrook. If omitted, uses env LEVANDE_DEFAULT_VILLAGE_NAME or the first village in the store."
+      },
+      "tourDate": { "type": "string", "description": "Single: date, with tourTime." },
+      "tourTime": { "type": "string", "description": "Single: time, with tourDate." },
+      "tourDates": { "type": "array", "items": { "type": "string" }, "description": "One or more dates; same length as tourTimes. A single string is accepted as one slot (Genesys may send strings instead of JSON arrays)." },
+      "tourTimes": { "type": "array", "items": { "type": "string" }, "description": "One or more times; same length as tourDates. A single string is accepted as one slot." },
+      "storePath": { "type": "string" }
+    }
+  },
+  "output": {
+    "type": "object",
+    "properties": {
+      "success": { "type": "boolean" },
+      "villageName": { "type": "string" },
+      "tourDate": { "type": "string" },
+      "tourTime": { "type": "string" },
+      "tourDates": { "type": "array" },
+      "tourTimes": { "type": "array" },
+      "slotCount": { "type": "number" },
+      "availableCount": { "type": "number" },
+      "availableTours": { "type": "array" },
+      "details": { "type": "object" },
+      "requiresConfirmation": { "type": "boolean" },
+      "confirmationPrompt": { "type": "string" },
+      "message": { "type": "string" },
+      "error": { "type": "string" },
+      "code": { "type": "string" }
+    }
+  }
+}

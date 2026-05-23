@@ -1,0 +1,238 @@
+{
+  "meta": {
+    "lastBookingSeq": 157,
+    "lastClientSeq": 1005,
+    "lastGroupSeq": 506
+  },
+  "planCatalog": {
+    "PLAN-ILMP": {
+      "planId": "PLAN-ILMP",
+      "planName": "Independent Living Maintenance Plan",
+      "services": [
+        "Personal Care",
+        "Mobility & Safety",
+        "Medication Support",
+        "Domestic Assistance"
+      ]
+    }
+  },
+  "clients": [
+    {
+      "clientId": "CLI-1001",
+      "fullName": "Alex Morgan",
+      "dob": "1958-03-12",
+      "phone": "61400111222",
+      "planId": "PLAN-ILMP"
+    },
+    {
+      "clientId": "CLI-1002",
+      "fullName": "Julian Brian",
+      "dob": "1962-07-19",
+      "phone": "0400111222",
+      "planId": "PLAN-ILMP"
+    },
+    {
+      "clientId": "CLI-1003",
+      "fullName": "Riley North",
+      "dob": "1991-04-11",
+      "phone": "61406910251",
+      "planId": "PLAN-ILMP"
+    },
+    {
+      "clientId": "CLI-1004",
+      "fullName": "Pat East",
+      "dob": "1971-01-01",
+      "phone": "61400777888",
+      "planId": "PLAN-ILMP"
+    },
+    {
+      "clientId": "CLI-1005",
+      "fullName": "Quinn East",
+      "dob": "1971-01-01",
+      "phone": "61400999000",
+      "planId": "PLAN-ILMP"
+    }
+  ],
+  "bookings": [
+    {
+      "bookingId": "BK140",
+      "bookingGroupId": "GRP-501",
+      "clientId": "CLI-1001",
+      "serviceName": "Personal Care",
+      "planId": "PLAN-ILMP",
+      "scheduledStart": "2026-04-27T09:00:00",
+      "status": "confirmed",
+      "weekStart": "2026-04-27"
+    },
+    {
+      "bookingId": "BK141",
+      "bookingGroupId": "GRP-501",
+      "clientId": "CLI-1001",
+      "serviceName": "Mobility & Safety",
+      "planId": "PLAN-ILMP",
+      "scheduledStart": "2026-04-28T10:30:00",
+      "status": "confirmed",
+      "weekStart": "2026-04-27"
+    },
+    {
+      "bookingId": "BK142",
+      "bookingGroupId": "GRP-501",
+      "clientId": "CLI-1001",
+      "serviceName": "Medication Support",
+      "planId": "PLAN-ILMP",
+      "scheduledStart": "2026-04-29T08:00:00",
+      "status": "confirmed",
+      "weekStart": "2026-04-27"
+    },
+    {
+      "bookingId": "BK143",
+      "bookingGroupId": "GRP-501",
+      "clientId": "CLI-1001",
+      "serviceName": "Domestic Assistance",
+      "planId": "PLAN-ILMP",
+      "scheduledStart": "2026-04-30T13:15:00",
+      "status": "confirmed",
+      "weekStart": "2026-04-27"
+    },
+    {
+      "bookingId": "BK144",
+      "bookingGroupId": "GRP-502",
+      "clientId": "CLI-1002",
+      "serviceName": "Personal Care",
+      "planId": "PLAN-ILMP",
+      "scheduledStart": "2026-04-27T10:00:00",
+      "status": "confirmed",
+      "weekStart": "2026-04-27"
+    },
+    {
+      "bookingId": "BK145",
+      "bookingGroupId": "GRP-502",
+      "clientId": "CLI-1002",
+      "serviceName": "Mobility & Safety",
+      "planId": "PLAN-ILMP",
+      "scheduledStart": "2026-04-28T10:00:00",
+      "status": "confirmed",
+      "weekStart": "2026-04-27"
+    },
+    {
+      "bookingId": "BK146",
+      "bookingGroupId": "GRP-502",
+      "clientId": "CLI-1002",
+      "serviceName": "Medication Support",
+      "planId": "PLAN-ILMP",
+      "scheduledStart": "2026-04-29T10:00:00",
+      "status": "confirmed",
+      "weekStart": "2026-04-27"
+    },
+    {
+      "bookingId": "BK147",
+      "bookingGroupId": "GRP-502",
+      "clientId": "CLI-1002",
+      "serviceName": "Domestic Assistance",
+      "planId": "PLAN-ILMP",
+      "scheduledStart": "2026-04-30T10:00:00",
+      "status": "confirmed",
+      "weekStart": "2026-04-27"
+    },
+    {
+      "bookingId": "BK148",
+      "bookingGroupId": "GRP-503",
+      "clientId": "CLI-1002",
+      "serviceName": "Personal Care",
+      "planId": "PLAN-ILMP",
+      "scheduledStart": "2026-04-27T10:00:00",
+      "status": "confirmed",
+      "weekStart": "2026-04-27"
+    },
+    {
+      "bookingId": "BK149",
+      "bookingGroupId": "GRP-503",
+      "clientId": "CLI-1002",
+      "serviceName": "Mobility & Safety",
+      "planId": "PLAN-ILMP",
+      "scheduledStart": "2026-04-28T10:00:00",
+      "status": "confirmed",
+      "weekStart": "2026-04-27"
+    },
+    {
+      "bookingId": "BK150",
+      "bookingGroupId": "GRP-503",
+      "clientId": "CLI-1002",
+      "serviceName": "Medication Support",
+      "planId": "PLAN-ILMP",
+      "scheduledStart": "2026-04-29T10:00:00",
+      "status": "confirmed",
+      "weekStart": "2026-04-27"
+    },
+    {
+      "bookingId": "BK151",
+      "bookingGroupId": "GRP-503",
+      "clientId": "CLI-1002",
+      "serviceName": "Domestic Assistance",
+      "planId": "PLAN-ILMP",
+      "scheduledStart": "2026-04-30T10:00:00",
+      "status": "confirmed",
+      "weekStart": "2026-04-27"
+    },
+    {
+      "bookingId": "BK152",
+      "bookingGroupId": "GRP-504",
+      "clientId": "CLI-1003",
+      "serviceName": "Personal Care",
+      "planId": "PLAN-ILMP",
+      "scheduledStart": "2026-05-04T09:00:00",
+      "status": "confirmed",
+      "weekStart": "2026-05-04"
+    },
+    {
+      "bookingId": "BK153",
+      "bookingGroupId": "GRP-504",
+      "clientId": "CLI-1003",
+      "serviceName": "Mobility & Safety",
+      "planId": "PLAN-ILMP",
+      "scheduledStart": "2026-05-05T10:00:00",
+      "status": "confirmed",
+      "weekStart": "2026-05-04"
+    },
+    {
+      "bookingId": "BK154",
+      "bookingGroupId": "GRP-504",
+      "clientId": "CLI-1003",
+      "serviceName": "Medication Support",
+      "planId": "PLAN-ILMP",
+      "scheduledStart": "2026-05-06T11:00:00",
+      "status": "confirmed",
+      "weekStart": "2026-05-04"
+    },
+    {
+      "bookingId": "BK155",
+      "bookingGroupId": "GRP-504",
+      "clientId": "CLI-1003",
+      "serviceName": "Domestic Assistance",
+      "planId": "PLAN-ILMP",
+      "scheduledStart": "2026-05-07T14:00:00",
+      "status": "confirmed",
+      "weekStart": "2026-05-04"
+    },
+    {
+      "bookingId": "BK156",
+      "bookingGroupId": "GRP-505",
+      "clientId": "CLI-1004",
+      "serviceName": "Personal Care",
+      "planId": "PLAN-ILMP",
+      "scheduledStart": "2026-05-04T08:30:00",
+      "status": "confirmed",
+      "weekStart": "2026-05-04"
+    },
+    {
+      "bookingId": "BK157",
+      "bookingGroupId": "GRP-506",
+      "clientId": "CLI-1005",
+      "serviceName": "Personal Care",
+      "planId": "PLAN-ILMP",
+      "scheduledStart": "2026-05-05T08:30:00",
+      "status": "confirmed",
+      "weekStart": "2026-05-04"
+    }
+  ]
+}

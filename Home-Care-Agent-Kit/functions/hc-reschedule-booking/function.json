@@ -1,0 +1,30 @@
+{
+  "name": "hc-reschedule-booking",
+  "description": "Moves a single confirmed service booking to a new start time after identity verification, optionally respecting slot conflicts unless explicitly skipped.",
+  "handler": "index.handler",
+  "runtime": "nodejs_22.x",
+  "input": {
+    "type": "object",
+    "required": ["clientId", "bookingId", "newScheduledStart"],
+    "properties": {
+      "clientId": { "type": "string" },
+      "bookingId": { "type": "string" },
+      "bookingReference": { "type": "string", "description": "Alias of bookingId" },
+      "newScheduledStart": { "type": "string", "description": "dd/mm/yyyy HH:mm or ISO datetime (e.g. 28/04/2026 14:00)" },
+      "skipConflictCheck": {
+        "type": "boolean",
+        "description": "Advanced testing flag; keep false in production flows"
+      },
+      "storePath": { "type": "string" }
+    }
+  },
+  "output": {
+    "type": "object",
+    "properties": {
+      "success": { "type": "boolean" },
+      "scheduledStart": { "type": "string" },
+      "error": { "type": "string" },
+      "code": { "type": "string" }
+    }
+  }
+}

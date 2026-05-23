@@ -1,0 +1,54 @@
+{
+  "name": "ls-idv-customer",
+  "description": "Verifies an existing life sciences customer by unique identifier, account number, and/or phone. Returns last ordered product history for reorder context.",
+  "handler": "handler.handler",
+  "runtime": "nodejs_22.x",
+  "input": {
+    "type": "object",
+    "properties": {
+      "uniqueIdentifier": {
+        "type": "string",
+        "description": "Customer unique ID (e.g. UID-LS-0042). Aliases: uniqueId, uid."
+      },
+      "accountNumber": {
+        "type": "string",
+        "description": "Account / unique number (e.g. ACC-88421). Aliases: uniqueNumber, customerNumber."
+      },
+      "phone": {
+        "type": "string",
+        "description": "Australian mobile +61 4… or 04…. Aliases: phoneNumber, mobile, ani."
+      },
+      "statedLastProduct": {
+        "type": "string",
+        "description": "What the caller says they last ordered (e.g. Normal Saline). Compared to on-file lastOrder for IDV. Aliases: lastOrderProduct, statedProductName."
+      },
+      "statedLastQuantity": {
+        "type": "number",
+        "description": "Quantity the caller states for last order. Aliases: lastOrderQuantity, statedQuantity."
+      },
+      "statedLastUnit": {
+        "type": "string",
+        "description": "case/cases or bag/bags for stated last order. Aliases: lastOrderUnit, statedUnit."
+      },
+      "storePath": { "type": "string" }
+    }
+  },
+  "output": {
+    "type": "object",
+    "properties": {
+      "success": { "type": "boolean" },
+      "idvStatus": { "type": "string" },
+      "customerId": { "type": "string" },
+      "organizationName": { "type": "string" },
+      "uniqueIdentifier": { "type": "string" },
+      "accountNumber": { "type": "string" },
+      "maskedPhone": { "type": "string" },
+      "lastOrder": { "type": "object" },
+      "lastOrderVerification": { "type": "object" },
+      "message": { "type": "string" },
+      "details": { "type": "object" },
+      "error": { "type": "string" },
+      "code": { "type": "string" }
+    }
+  }
+}

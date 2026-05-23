@@ -1,0 +1,45 @@
+{
+  "name": "cm-idv-claimant",
+  "description": "Captures lightweight insurance claimant IDV details for Westfund claim intake. Demo mode accepts any provided name, DOB and optional member id.",
+  "handler": "handler.handler",
+  "runtime": "nodejs_22.x",
+  "input": {
+    "type": "object",
+    "properties": {
+      "fullName": {
+        "type": "string",
+        "description": "Claimant name. Aliases: name, Name, FullName, customerName."
+      },
+      "dob": {
+        "type": "string",
+        "description": "DOB dd/mm/yyyy or yyyy-mm-dd. Aliases: DOB, Dob, dateOfBirth."
+      },
+      "memberId": {
+        "type": "string",
+        "description": "Optional member id. Aliases: MemberId, memberNumber."
+      },
+      "policy": {
+        "type": "string",
+        "description": "Optional policy name. Aliases: Policy, policyName."
+      },
+      "storePath": { "type": "string" }
+    }
+  },
+  "output": {
+    "type": "object",
+    "properties": {
+      "success": { "type": "boolean" },
+      "idvStatus": { "type": "string" },
+      "planName": { "type": "string" },
+      "claimantId": { "type": "string" },
+      "fullName": { "type": "string" },
+      "dob": { "type": "string" },
+      "dobIso": { "type": "string" },
+      "memberId": { "type": "string" },
+      "policy": { "type": "string" },
+      "message": { "type": "string" },
+      "error": { "type": "string" },
+      "code": { "type": "string" }
+    }
+  }
+}

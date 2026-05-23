@@ -1,0 +1,15 @@
+{
+  "name": "claim-management-kit-insurance",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Genesys Cloud Functions (Node 22) for Westfund insurance claim intake",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "sync": "node scripts/sync-lib.js",
+    "zip": "bash scripts/build-zips.sh",
+    "verify:zip": "node scripts/verify-genesys-zips.js",
+    "test:smoke": "node scripts/sync-lib.js && node scripts/local-smoke.js"
+  }
+}

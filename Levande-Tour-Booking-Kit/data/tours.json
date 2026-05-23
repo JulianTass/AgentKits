@@ -1,0 +1,39 @@
+{
+  "meta": {
+    "lastBookingSeq": 344
+  },
+  "villages": [
+    {
+      "villageId": "VIL-LINCOLN",
+      "villageName": "Lincoln",
+      "aliases": [
+        "Linc",
+        "Lincoln Village",
+        "Lincolin",
+        "Lyncoln"
+      ]
+    },
+    {
+      "villageId": "VIL-WARATAH",
+      "villageName": "Waratah",
+      "aliases": [
+        "Warata",
+        "Warratah",
+        "Waratta",
+        "Woratah"
+      ]
+    },
+    {
+      "villageId": "VIL-MAYBROOK",
+      "villageName": "Maybrook",
+      "aliases": [
+        "May brook",
+        "Maybrok",
+        "Maybrooke",
+        "Mabrook"
+      ]
+    }
+  ],
+  "slots": [],
+  "bookings": []
+}

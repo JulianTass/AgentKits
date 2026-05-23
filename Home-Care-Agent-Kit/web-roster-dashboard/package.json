@@ -1,0 +1,14 @@
+{
+  "name": "home-care-roster-dashboard",
+  "private": true,
+  "description": "Local demo: HTML roster + API for Genesys/ngrok testing with hc-add-new-booking",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Home Care roster (demo)</title>
+  <style>
+    :root {
+      font-family: system-ui, sans-serif;
+      background: #0f1419;
+      color: #e7ecf3;
+    }
+    body { max-width: 960px; margin: 0 auto; padding: 1.25rem; }
+    h1 { font-size: 1.25rem; font-weight: 600; }
+    .muted { color: #8b98a5; font-size: 0.875rem; }
+    .card {
+      background: #1a2332;
+      border-radius: 8px;
+      padding: 1rem;
+      margin: 1rem 0;
+      border: 1px solid #2a3544;
+    }
+    .live {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #3ecf8e;
+      margin-right: 6px;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse { 50% { opacity: 0.4; } }
+    table { width: 100%; border-collapse: collapse; font-size: 0.8125rem; }
+    th, td { text-align: left; padding: 0.4rem 0.5rem; border-bottom: 1px solid #2a3544; }
+    th { color: #8b98a5; font-weight: 500; }
+    .toast {
+      background: #243044;
+      border-left: 3px solid #5b9cf5;
+      padding: 0.75rem 1rem;
+      margin: 0.5rem 0;
+      border-radius: 4px;
+      font-size: 0.875rem;
+    }
+    .toast.webhook { border-left-color: #c9a227; }
+  </style>
+</head>
+<body>
+  <h1><span class="live" aria-hidden="true"></span> Home Care roster (demo)</h1>
+  <p class="muted">
+    Updates when <code>POST /api/bookings/add</code> runs here, or when the Genesys zip posts to
+    <code>/api/notify</code> (<code>ROSTER_NOTIFY_URL</code>).
+  </p>
+
+  <div id="toasts"></div>
+
+  <div class="card">
+    <h2 style="margin:0 0 0.5rem;font-size:1rem;">Recent bookings (confirmed)</h2>
+    <div style="overflow-x:auto;">
+      <table>
+        <thead>
+          <tr>
+            <th>Booking</th>
+            <th>Client</th>
+            <th>Service</th>
+            <th>Start</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const rowsEl = document.getElementById('rows');
+    const toastsEl = document.getElementById('toasts');
+
+    function toast(html, cls) {
+      const d = document.createElement('div');
+      d.className = 'toast' + (cls ? ' ' + cls : '');
+      d.innerHTML = html;
+      toastsEl.prepend(d);
+      setTimeout(() => d.remove(), 45000);
+    }
+
+    function renderRoster(data) {
+      const list = (data.bookings || [])
+        .filter((b) => b.status === 'confirmed')
+        .slice(-40)
+        .reverse();
+      rowsEl.innerHTML = list
+        .map(
+          (b) =>
+            `<tr><td>${escapeHtml(b.bookingId)}</td><td>${escapeHtml(b.clientId)}</td>` +
+            `<td>${escapeHtml(b.serviceName)}</td><td>${escapeHtml(b.scheduledStart || '')}</td>` +
+            `<td>${escapeHtml(b.status)}</td></tr>`,
+        )
+        .join('');
+    }
+
+    function escapeHtml(s) {
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    async function refresh() {
+      const r = await fetch('/api/roster');
+      const j = await r.json();
+      if (j.success && j.data) renderRoster(j.data);
+    }
+
+    refresh();
+    const es = new EventSource('/api/events');
+    es.onmessage = (ev) => {
+      try {
+        const msg = JSON.parse(ev.data);
+        if (msg.type === 'add' && msg.result) {
+          toast(
+            `<strong>New booking (local API)</strong><br/>${escapeHtml(msg.result.fullName || '')} — ` +
+              escapeHtml(msg.result.bookingId || '') +
+              ` (${escapeHtml(String(msg.result.servicesBooked?.length || 0))} services)`,
+          );
+          refresh();
+        }
+        if (msg.type === 'webhook' && msg.result) {
+          const r = msg.result;
+          toast(
+            `<strong>New booking (Genesys zip → notify)</strong><br/>${escapeHtml(r.fullName || '')} — ` +
+              escapeHtml(r.bookingId || ''),
+            'webhook',
+          );
+          refresh();
+        }
+      } catch {
+        /* ignore */
+      }
+    };
+    es.onerror = () => {
+      /* browser will retry */
+    };
+  </script>
+</body>
+</html>

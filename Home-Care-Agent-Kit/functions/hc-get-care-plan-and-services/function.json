@@ -1,0 +1,26 @@
+{
+  "name": "hc-get-care-plan-and-services",
+  "description": "Returns the customer's plan catalogue entry, roster services, and which plan services are booked for the selected week once clientId is known.",
+  "handler": "index.handler",
+  "runtime": "nodejs_22.x",
+  "input": {
+    "type": "object",
+    "required": ["clientId"],
+    "properties": {
+      "clientId": { "type": "string" },
+      "weekStart": { "type": "string", "description": "Monday date dd/mm/yyyy or yyyy-mm-dd (optional)" },
+      "referenceDate": { "type": "string", "description": "Any date dd/mm/yyyy or yyyy-mm-dd to infer weekStart when omitted" },
+      "storePath": { "type": "string" }
+    }
+  },
+  "output": {
+    "type": "object",
+    "properties": {
+      "success": { "type": "boolean" },
+      "planName": { "type": "string" },
+      "planServices": { "type": "array" },
+      "bookingsThisWeek": { "type": "array" },
+      "error": { "type": "string" }
+    }
+  }
+}

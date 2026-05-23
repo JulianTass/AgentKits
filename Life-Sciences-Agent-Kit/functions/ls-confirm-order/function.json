@@ -1,0 +1,43 @@
+{
+  "name": "ls-confirm-order",
+  "description": "Confirms a life sciences supply order, decrements stock, and returns orderConfirmationNumber. Requires customerId from IDV or matching identifiers. Rejects lines that exceed available stock.",
+  "handler": "handler.handler",
+  "runtime": "nodejs_22.x",
+  "input": {
+    "type": "object",
+    "properties": {
+      "customerId": {
+        "type": "string",
+        "description": "From ls_idv_customer. Preferred after identity check."
+      },
+      "uniqueIdentifier": { "type": "string" },
+      "accountNumber": { "type": "string" },
+      "phone": { "type": "string" },
+      "lineItems": {
+        "type": "array",
+        "description": "Array of { productName, quantity, unit }. Or pass single productName, quantity, unit."
+      },
+      "productName": { "type": "string" },
+      "quantity": { "type": "number" },
+      "unit": { "type": "string" },
+      "storePath": { "type": "string" }
+    }
+  },
+  "output": {
+    "type": "object",
+    "properties": {
+      "success": { "type": "boolean" },
+      "orderConfirmationNumber": { "type": "string" },
+      "orderNumber": { "type": "string" },
+      "orderStatus": { "type": "string" },
+      "customerId": { "type": "string" },
+      "organizationName": { "type": "string" },
+      "lines": { "type": "array" },
+      "estimatedDeliveryWindow": { "type": "string" },
+      "message": { "type": "string" },
+      "error": { "type": "string" },
+      "code": { "type": "string" },
+      "details": { "type": "object" }
+    }
+  }
+}

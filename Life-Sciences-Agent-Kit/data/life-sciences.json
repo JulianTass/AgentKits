@@ -1,0 +1,166 @@
+{
+  "meta": {
+    "lastCustomerSeq": 103,
+    "lastOrderSeq": 5002
+  },
+  "products": [
+    {
+      "productId": "LS-PROD-001",
+      "name": "0.9% Sodium Chloride Injection (Normal Saline, 1L bags)",
+      "shortName": "Normal Saline",
+      "aliases": [
+        "normal saline",
+        "saline",
+        "ns",
+        "0.9% sodium chloride",
+        "sodium chloride injection",
+        "product 1"
+      ],
+      "unit": "bag",
+      "caseSize": 12,
+      "stockBags": 480,
+      "unitPriceAud": 8.5,
+      "currency": "AUD"
+    },
+    {
+      "productId": "LS-PROD-002",
+      "name": "5% Dextrose in Lactated Ringer's Solution (D5LR, 500ml bags)",
+      "shortName": "D5LR",
+      "aliases": [
+        "d5lr",
+        "dextrose lactated ringers",
+        "dextrose in lactated ringers",
+        "5% dextrose in lactated ringer's",
+        "product 2"
+      ],
+      "unit": "bag",
+      "caseSize": 12,
+      "stockBags": 18,
+      "unitPriceAud": 12.0,
+      "currency": "AUD"
+    },
+    {
+      "productId": "LS-PROD-003",
+      "name": "Lactated Ringer's Injection (1L bags)",
+      "shortName": "Lactated Ringer's",
+      "aliases": ["lactated ringers", "lr", "ringers", "lactated ringer"],
+      "unit": "bag",
+      "caseSize": 12,
+      "stockBags": 216,
+      "unitPriceAud": 9.25,
+      "currency": "AUD"
+    },
+    {
+      "productId": "LS-PROD-004",
+      "name": "Sterile Water for Injection (500ml bags)",
+      "shortName": "Sterile Water",
+      "aliases": ["sterile water", "swfi", "water for injection"],
+      "unit": "bag",
+      "caseSize": 20,
+      "stockBags": 160,
+      "unitPriceAud": 6.75,
+      "currency": "AUD"
+    },
+    {
+      "productId": "LS-PROD-005",
+      "name": "0.45% Sodium Chloride Injection (Half Normal Saline, 1L bags)",
+      "shortName": "Half Normal Saline",
+      "aliases": ["half normal saline", "0.45% sodium chloride", "half ns"],
+      "unit": "bag",
+      "caseSize": 12,
+      "stockBags": 96,
+      "unitPriceAud": 8.0,
+      "currency": "AUD"
+    },
+    {
+      "productId": "LS-PROD-006",
+      "name": "10% Dextrose Injection (500ml bags)",
+      "shortName": "D10",
+      "aliases": ["d10", "10% dextrose", "dextrose 10%"],
+      "unit": "bag",
+      "caseSize": 12,
+      "stockBags": 0,
+      "unitPriceAud": 14.5,
+      "currency": "AUD"
+    }
+  ],
+  "customers": [
+    {
+      "customerId": "LSC-101",
+      "organizationName": "Metro Regional Hospital",
+      "uniqueIdentifier": "UID-LS-0042",
+      "accountNumber": "ACC-88421",
+      "phone": "61400111222",
+      "lastOrder": {
+        "orderNumber": "LSO-5001",
+        "productId": "LS-PROD-001",
+        "productName": "Normal Saline",
+        "quantity": 8,
+        "unit": "case",
+        "orderedAt": "2026-05-10T14:22:00.000Z"
+      }
+    },
+    {
+      "customerId": "LSC-102",
+      "organizationName": "Coastal Day Surgery",
+      "uniqueIdentifier": "UID-LS-0098",
+      "accountNumber": "ACC-55290",
+      "phone": "61422334455",
+      "lastOrder": {
+        "orderNumber": "LSO-5002",
+        "productId": "LS-PROD-002",
+        "productName": "D5LR",
+        "quantity": 5,
+        "unit": "bag",
+        "orderedAt": "2026-05-15T09:05:00.000Z"
+      }
+    },
+    {
+      "customerId": "LSC-103",
+      "organizationName": "Northside Infusion Clinic",
+      "uniqueIdentifier": "UID-LS-0155",
+      "accountNumber": "ACC-77103",
+      "phone": "61455667788",
+      "lastOrder": {
+        "orderNumber": "LSO-4999",
+        "productId": "LS-PROD-003",
+        "productName": "Lactated Ringer's",
+        "quantity": 4,
+        "unit": "case",
+        "orderedAt": "2026-04-28T11:30:00.000Z"
+      }
+    }
+  ],
+  "orders": [
+    {
+      "orderNumber": "LSO-5001",
+      "customerId": "LSC-101",
+      "status": "confirmed",
+      "lines": [
+        {
+          "productId": "LS-PROD-001",
+          "productName": "Normal Saline",
+          "quantity": 8,
+          "unit": "case",
+          "bagsFulfilled": 96
+        }
+      ],
+      "createdAt": "2026-05-10T14:22:00.000Z"
+    },
+    {
+      "orderNumber": "LSO-5002",
+      "customerId": "LSC-102",
+      "status": "confirmed",
+      "lines": [
+        {
+          "productId": "LS-PROD-002",
+          "productName": "D5LR",
+          "quantity": 5,
+          "unit": "bag",
+          "bagsFulfilled": 5
+        }
+      ],
+      "createdAt": "2026-05-15T09:05:00.000Z"
+    }
+  ]
+}

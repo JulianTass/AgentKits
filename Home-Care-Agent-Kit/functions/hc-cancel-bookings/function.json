@@ -1,0 +1,31 @@
+{
+  "name": "hc-cancel-bookings",
+  "description": "Cancels one or many confirmed service bookings for a verified client using explicit booking ids or service names within a roster week.",
+  "handler": "index.handler",
+  "runtime": "nodejs_22.x",
+  "input": {
+    "type": "object",
+    "required": ["clientId"],
+    "properties": {
+      "clientId": { "type": "string" },
+      "bookingIds": { "type": "array", "items": { "type": "string" } },
+      "bookingId": { "type": "string", "description": "Convenience alias when cancelling a single booking" },
+      "serviceNames": { "type": "array", "items": { "type": "string" } },
+      "serviceName": { "type": "string" },
+      "weekStart": {
+        "type": "string",
+        "description": "Monday date dd/mm/yyyy or yyyy-mm-dd; required when selecting by serviceNames"
+      },
+      "storePath": { "type": "string" }
+    }
+  },
+  "output": {
+    "type": "object",
+    "properties": {
+      "success": { "type": "boolean" },
+      "cancelledCount": { "type": "number" },
+      "cancelled": { "type": "array" },
+      "error": { "type": "string" }
+    }
+  }
+}

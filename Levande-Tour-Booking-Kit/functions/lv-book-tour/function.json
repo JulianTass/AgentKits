@@ -1,0 +1,70 @@
+{
+  "name": "lv-book-tour",
+  "description": "Book one or more tours. villageName is optional — omitted uses LEVANDE_DEFAULT_VILLAGE_NAME if set, else first village in the store. tourDate/tourTime optional when omitted: LEVANDE_DEFAULT_TOUR_DATE + LEVANDE_DEFAULT_TOUR_TIME if both set, else next Sydney calendar day at 10:00. Optional storePath.",
+  "handler": "handler.handler",
+  "runtime": "nodejs_22.x",
+  "input": {
+    "type": "object",
+    "required": ["fullName", "dob", "phone"],
+    "properties": {
+      "villageName": {
+        "type": "string",
+        "description": "Optional. If omitted, uses LEVANDE_DEFAULT_VILLAGE_NAME or the first village in the store."
+      },
+      "fullName": { "type": "string" },
+      "dob": { "type": "string" },
+      "phone": {
+        "type": "string",
+        "description": "Australian mobile: 04XXXXXXXX or +61 4XXXXXXXX (spaces/dashes ok), e.g. 0406910251 or +61406910251."
+      },
+      "tourDate": {
+        "type": "string",
+        "description": "Optional for book-only flows. If omitted with tourTime, see tourTime. If both omitted with tourTimes, use arrays. If all omitted, default slot (env or next Sydney day 10:00)."
+      },
+      "tourTime": {
+        "type": "string",
+        "description": "Optional with tourDate for book-only flows. If both date and time are omitted, a default slot is used."
+      },
+      "tourDates": { "type": "array", "items": { "type": "string" }, "description": "Parallel with tourTimes; a single string counts as one slot." },
+      "tourTimes": { "type": "array", "items": { "type": "string" }, "description": "Parallel with tourDates; a single string counts as one slot." },
+      "storePath": { "type": "string" }
+    }
+  },
+  "output": {
+    "type": "object",
+    "properties": {
+      "success": { "type": "boolean" },
+      "bookingReference": { "type": "string" },
+      "bookingId": { "type": "string" },
+      "bookingReferences": { "type": "array" },
+      "bookings": { "type": "array" },
+      "villageName": { "type": "string" },
+      "fullName": { "type": "string" },
+      "tourDate": { "type": "string" },
+      "tourTime": { "type": "string" },
+      "tourDates": { "type": "array" },
+      "tourTimes": { "type": "array" },
+      "slotCount": { "type": "number" },
+      "dob": { "type": "string" },
+      "dobIso": { "type": "string" },
+      "phone": { "type": "string", "description": "Local form 04XXXXXXXX" },
+      "phoneE164": { "type": "string", "description": "+614XXXXXXXX" },
+      "scheduledStart": { "type": "string" },
+      "scheduledStartDisplay": { "type": "string" },
+      "implicitTourSlot": {
+        "type": "boolean",
+        "description": "True when tourDate/tourTime were omitted and a default slot was applied."
+      },
+      "implicitSlotAdjusted": {
+        "type": "boolean",
+        "description": "True when the default slot was already taken and the next free day at the same time was used."
+      },
+      "details": { "type": "object" },
+      "requiresConfirmation": { "type": "boolean" },
+      "confirmationPrompt": { "type": "string" },
+      "message": { "type": "string" },
+      "error": { "type": "string" },
+      "code": { "type": "string" }
+    }
+  }
+}

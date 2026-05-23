@@ -1,0 +1,26 @@
+{
+  "name": "hc-next-available-bookings",
+  "description": "Lists upcoming candidate slots per plan service, excluding slots that already have a confirmed booking for the same client and service.",
+  "handler": "handler.handler",
+  "runtime": "nodejs_22.x",
+  "input": {
+    "type": "object",
+    "required": ["clientId"],
+    "properties": {
+      "clientId": { "type": "string", "description": "From IDV. Aliases: ClientId, CustomerId" },
+      "fromDate": { "type": "string", "description": "Horizon start dd/mm/yyyy or yyyy-mm-dd. Aliases: FromDate, searchFrom" },
+      "serviceName": { "type": "string", "description": "Optional single-service filter (alias: ServiceName)" },
+      "serviceNames": { "type": "array", "items": { "type": "string" }, "description": "Optional list (alias: ServiceNames)" },
+      "perServiceLimit": { "type": "number", "description": "Max suggestions per service, default 5 (alias: PerServiceLimit)" },
+      "storePath": { "type": "string" }
+    }
+  },
+  "output": {
+    "type": "object",
+    "properties": {
+      "success": { "type": "boolean" },
+      "availability": { "type": "object" },
+      "error": { "type": "string" }
+    }
+  }
+}
