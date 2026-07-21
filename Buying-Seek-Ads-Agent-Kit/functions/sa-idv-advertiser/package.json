@@ -1,0 +1,7 @@
+{
+  "name": "sa-idv-advertiser",
+  "version": "1.0.0",
+  "private": true,
+  "main": "handler.js",
+  "engines": { "node": ">=22" }
+}

@@ -1,0 +1,52 @@
+{
+  "name": "sa-idv-advertiser",
+  "description": "Seek advertiser IDV (demo/open mode). Requires mobileConfirmationCode (4 digits sent to Seek mobile app) and seekId (6-character Seek PIN) in one call. Any valid-format values are accepted and return VERIFIED.",
+  "handler": "handler.handler",
+  "runtime": "nodejs_22.x",
+  "input": {
+    "type": "object",
+    "required": ["mobileConfirmationCode", "seekId"],
+    "properties": {
+      "mobileConfirmationCode": {
+        "type": "string",
+        "description": "Required. Exactly 4 digits — the confirmation code sent to the Seek mobile app. Aliases: confirmationCode, mobileCode, otp, verificationCode."
+      },
+      "seekId": {
+        "type": "string",
+        "description": "Required. Exactly 6 characters (letters and/or numbers) — the Seek account PIN. Aliases: seekPin, pin."
+      },
+      "companyName": {
+        "type": "string",
+        "description": "Optional employer/organisation name. Aliases: organisationName, organizationName."
+      },
+      "contactName": {
+        "type": "string",
+        "description": "Optional contact name. Aliases: name, fullName."
+      },
+      "phone": {
+        "type": "string",
+        "description": "Optional contact phone. Aliases: phoneNumber, mobile."
+      },
+      "storePath": { "type": "string" }
+    }
+  },
+  "output": {
+    "type": "object",
+    "properties": {
+      "success": { "type": "boolean" },
+      "idvStatus": { "type": "string" },
+      "demoMode": { "type": "boolean" },
+      "mobileConfirmationAccepted": { "type": "boolean" },
+      "mobileConfirmationCode": { "type": "string" },
+      "advertiserId": { "type": "string" },
+      "companyName": { "type": "string" },
+      "contactName": { "type": "string" },
+      "seekId": { "type": "string" },
+      "maskedPhone": { "type": "string" },
+      "message": { "type": "string" },
+      "details": { "type": "object" },
+      "error": { "type": "string" },
+      "code": { "type": "string" }
+    }
+  }
+}

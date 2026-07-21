@@ -1,0 +1,35 @@
+{
+  "meta": {
+    "lastAdvertiserSeq": 104
+  },
+  "advertisers": [
+    {
+      "advertiserId": "SA-ADV-101",
+      "companyName": "Harbour City Medical Group",
+      "seekId": "HC4MG2",
+      "contactName": "Priya Sharma",
+      "phone": "61400111222"
+    },
+    {
+      "advertiserId": "SA-ADV-102",
+      "companyName": "Northside Aged Care",
+      "seekId": "NSAC88",
+      "contactName": "James O'Brien",
+      "phone": "61422334455"
+    },
+    {
+      "advertiserId": "SA-ADV-103",
+      "companyName": "Bright Future Early Learning",
+      "seekId": "BFEL01",
+      "contactName": "Mia Chen",
+      "phone": "61455667788"
+    },
+    {
+      "advertiserId": "SA-ADV-104",
+      "companyName": "Bright Future Early Learning",
+      "seekId": "DEMO99",
+      "contactName": "Mia Chen",
+      "phone": "61455667788"
+    }
+  ]
+}

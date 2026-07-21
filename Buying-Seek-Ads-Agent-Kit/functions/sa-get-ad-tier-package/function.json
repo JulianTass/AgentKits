@@ -1,0 +1,60 @@
+{
+  "name": "sa-get-ad-tier-package",
+  "description": "Returns Seek branded ad budget package details for Occasional (2–3 ads), Regular (4–6 ads), or Frequent (6–10 ads) hiring tiers. Pass tier and/or adCount; validates ad count against tier rules and returns budget, discounts, eligible ad types, and summary text.",
+  "handler": "handler.handler",
+  "runtime": "nodejs_22.x",
+  "input": {
+    "type": "object",
+    "properties": {
+      "tier": {
+        "type": "string",
+        "description": "Hiring tier: occasional, regular, or frequent. Aliases: hiringTier, adTier, packageTier."
+      },
+      "adCount": {
+        "type": "number",
+        "description": "Number of job ads (2–10). Maps to tier when tier omitted: 2–3 occasional, 4–6 regular, 6–10 frequent. Aliases: numberOfAds, jobAdCount, ads."
+      },
+      "advertiserId": {
+        "type": "string",
+        "description": "Optional. advertiserId from sa_idv_advertiser."
+      },
+      "seekId": {
+        "type": "string",
+        "description": "Optional. 6-character Seek PIN to attach advertiser context."
+      },
+      "listTiers": {
+        "type": "boolean",
+        "description": "If true, returns all tier options without package detail."
+      },
+      "storePath": { "type": "string" }
+    }
+  },
+  "output": {
+    "type": "object",
+    "properties": {
+      "success": { "type": "boolean" },
+      "tier": { "type": "string" },
+      "tierLabel": { "type": "string" },
+      "adRangeDisplay": { "type": "string" },
+      "adCount": { "type": "number" },
+      "cardPriceDisplay": { "type": "string" },
+      "recommendedBudgetAud": { "type": "number" },
+      "recommendedBudgetDisplay": { "type": "string" },
+      "currency": { "type": "string" },
+      "discounts": { "type": "array" },
+      "brandedAdBudget": { "type": "object" },
+      "eligibleAdTypes": { "type": "array" },
+      "howItWorks": { "type": "array" },
+      "termsNote": { "type": "string" },
+      "summaryText": { "type": "string" },
+      "openingLine": { "type": "string" },
+      "advertiserId": { "type": "string" },
+      "companyName": { "type": "string" },
+      "availableTiers": { "type": "array" },
+      "message": { "type": "string" },
+      "details": { "type": "object" },
+      "error": { "type": "string" },
+      "code": { "type": "string" }
+    }
+  }
+}
