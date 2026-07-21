@@ -123,11 +123,18 @@ function quoteLine(product, quantity, unit) {
 
 function defaultData() {
   return {
-    meta: { lastCustomerSeq: 100, lastOrderSeq: 5000 },
+    meta: { lastCustomerSeq: 100, lastOrderSeq: 5000, lastSubscriptionSeq: 1000 },
     products: defaultProducts(),
     customers: [],
     orders: [],
+    subscriptions: [],
   };
+}
+
+function ensureStoreShape(data) {
+  if (!data.meta) data.meta = {};
+  if (data.meta.lastSubscriptionSeq == null) data.meta.lastSubscriptionSeq = 1000;
+  if (!Array.isArray(data.subscriptions)) data.subscriptions = [];
 }
 
 function isReadonlyDeployLayout() {
@@ -172,11 +179,14 @@ function loadStore(storePath) {
     const seed = fs.existsSync(bundled)
       ? JSON.parse(fs.readFileSync(bundled, 'utf8'))
       : defaultData();
+    ensureStoreShape(seed);
     ensureDirForFile(p);
     fs.writeFileSync(p, JSON.stringify(seed, null, 2), 'utf8');
     return { path: p, data: seed };
   }
-  return { path: p, data: JSON.parse(fs.readFileSync(p, 'utf8')) };
+  const data = JSON.parse(fs.readFileSync(p, 'utf8'));
+  ensureStoreShape(data);
+  return { path: p, data };
 }
 
 function saveStore(storePath, data) {
@@ -191,6 +201,17 @@ function normalizePhone(input) {
   if (!d) return '';
   if (d.startsWith('0') && d.length === 10) return `61${d.slice(1)}`;
   return d;
+}
+
+/** Normalize LSC-### ids from Architect (case, spacing, numeric-only). */
+function normalizeCustomerId(input) {
+  const s = String(input || '').trim();
+  if (!s) return '';
+  const upper = s.toUpperCase().replace(/\s+/g, '');
+  const m = upper.match(/^LSC-?(\d+)$/);
+  if (m) return `LSC-${m[1]}`;
+  if (/^\d+$/.test(upper)) return `LSC-${upper}`;
+  return upper;
 }
 
 function normalizeKey(input) {
@@ -300,6 +321,40 @@ function checkAvailability(product, quantity, unit) {
   };
 }
 
+const MATRIX_QUANTITIES = [1, 2, 3, 4];
+const MATRIX_UNITS = ['bag', 'case'];
+
+/** Pre-built qty 1–4 × bag/case with line cost and stock check (for agent quick lookup). */
+function quantityPriceMatrix(product) {
+  const matrix = { bag: [], case: [] };
+  for (const unit of MATRIX_UNITS) {
+    for (const qty of MATRIX_QUANTITIES) {
+      const availability = checkAvailability(product, qty, unit);
+      const quote = quoteLine(product, qty, unit);
+      matrix[unit].push({
+        quantity: qty,
+        unit,
+        unitPriceAud: quote.unitPriceAud,
+        pricePerCaseAud: quote.pricePerCaseAud,
+        lineTotalAud: quote.lineTotalAud,
+        lineTotalDisplay: quote.lineTotalDisplay,
+        bagsRequested: availability.bagsRequested,
+        canFulfill: availability.canFulfill,
+        stockStatus: availability.stockStatus,
+        lowStock: availability.lowStock,
+      });
+    }
+  }
+  return matrix;
+}
+
+function productViewWithMatrix(product) {
+  return {
+    ...productView(product),
+    quantityPriceMatrix: quantityPriceMatrix(product),
+  };
+}
+
 function findCustomer(data, { uniqueIdentifier, phone, accountNumber }) {
   const uid = uniqueIdentifier ? String(uniqueIdentifier).trim().toUpperCase() : '';
   const acct = accountNumber ? String(accountNumber).trim().toUpperCase() : '';
@@ -403,6 +458,120 @@ function lastOrderShape(lastOrder) {
   };
 }
 
+function statedLastOrderFromInput(data, stated) {
+  const productName = stated.productName ? String(stated.productName).trim() : '';
+  const quantityRaw = stated.quantity;
+  const unitRaw = stated.unit ? String(stated.unit).trim() : '';
+  const product = productName ? findProduct(data, productName) : null;
+  const qty = Math.max(1, Math.floor(Number(quantityRaw) || 1));
+  const unit = parseUnit(unitRaw) || 'bag';
+  return {
+    productId: product ? product.productId : null,
+    productName: product ? product.shortName : productName || 'Unknown product',
+    quantity: qty,
+    unit,
+    orderedAt: new Date().toISOString(),
+  };
+}
+
+/** Demo/open IDV: capture stated last order; always accepts caller input. */
+function openLastOrderVerification(data, stated) {
+  const captured = statedLastOrderFromInput(data, stated);
+  return {
+    required: true,
+    demoMode: true,
+    match: true,
+    stated: captured,
+    message:
+      'Demo mode: stated account, phone, and last order accepted. Any provided values are treated as verified.',
+  };
+}
+
+/** Find or create customer by account + phone (open demo — any values accepted). */
+function resolveOrCreateCustomerOpen(data, fields) {
+  const acct = String(fields.accountNumber || '')
+    .trim()
+    .toUpperCase();
+  const p = normalizePhone(fields.phone);
+  let customer = data.customers.find(
+    (c) =>
+      String(c.accountNumber || '')
+        .trim()
+        .toUpperCase() === acct && normalizePhone(c.phone) === p,
+  );
+  if (!customer) {
+    customer = {
+      customerId: nextCustomerId(data),
+      organizationName: fields.organizationName || 'Life Sciences Customer',
+      uniqueIdentifier:
+        fields.uniqueIdentifier ||
+        `UID-LS-${String(data.meta.lastCustomerSeq).padStart(4, '0')}`,
+      accountNumber: acct,
+      phone: p,
+      lastOrder: null,
+    };
+    data.customers.push(customer);
+  } else {
+    if (fields.organizationName) customer.organizationName = fields.organizationName;
+    if (fields.uniqueIdentifier) {
+      customer.uniqueIdentifier = String(fields.uniqueIdentifier).trim().toUpperCase();
+    }
+    customer.accountNumber = acct;
+    customer.phone = p;
+  }
+  return customer;
+}
+
+/**
+ * Demo/open order confirm: accept customerId from a prior IDV call even when this
+ * function instance has a fresh store (separate Genesys zip deployments).
+ */
+function resolveCustomerForOrderOpen(data, fields) {
+  const customerId = fields.customerId ? normalizeCustomerId(fields.customerId) : '';
+  const accountNumber = fields.accountNumber
+    ? String(fields.accountNumber).trim().toUpperCase()
+    : '';
+  const phone = fields.phone ? normalizePhone(fields.phone) : '';
+  const organizationName = fields.organizationName || 'Life Sciences Customer';
+  const uniqueIdentifier = fields.uniqueIdentifier
+    ? String(fields.uniqueIdentifier).trim().toUpperCase()
+    : '';
+
+  if (customerId) {
+    let customer = data.customers.find(
+      (c) => normalizeCustomerId(c.customerId) === customerId,
+    );
+    if (customer) {
+      if (accountNumber) customer.accountNumber = accountNumber;
+      if (phone) customer.phone = phone;
+      if (organizationName) customer.organizationName = organizationName;
+      if (uniqueIdentifier) customer.uniqueIdentifier = uniqueIdentifier;
+      return customer;
+    }
+    customer = {
+      customerId,
+      organizationName,
+      uniqueIdentifier: uniqueIdentifier || `UID-LS-${customerId.replace(/^LSC-/, '')}`,
+      accountNumber: accountNumber || `ACC-${customerId.replace(/^LSC-/, '')}`,
+      phone: phone || '',
+      lastOrder: null,
+    };
+    data.customers.push(customer);
+    return customer;
+  }
+
+  if (accountNumber && phone) {
+    return resolveOrCreateCustomerOpen(data, {
+      accountNumber,
+      phone,
+      organizationName,
+      uniqueIdentifier,
+    });
+  }
+
+  return null;
+}
+
 /** Compare caller-stated last order to on-file last order (identity validation). */
 function verifyStatedLastOrder(data, onFile, stated) {
   const productName = stated.productName ? String(stated.productName).trim() : '';
@@ -479,6 +648,105 @@ function nextOrderNumber(data) {
   return `LSO-${data.meta.lastOrderSeq}`;
 }
 
+function nextSubscriptionId(data) {
+  ensureStoreShape(data);
+  data.meta.lastSubscriptionSeq += 1;
+  return `LSN-${data.meta.lastSubscriptionSeq}`;
+}
+
+function subscriptionMatchesRequest(sub, customerId, productId, quantity, unit) {
+  if (sub.status !== 'active') return false;
+  if (normalizeCustomerId(sub.customerId) !== normalizeCustomerId(customerId)) return false;
+  if (sub.productId !== productId) return false;
+  const reqQty = quantity != null ? Math.floor(Number(quantity)) : null;
+  const reqUnit = unit ? parseUnit(unit) : null;
+  const subQty = sub.quantity != null ? Math.floor(Number(sub.quantity)) : null;
+  const subUnit = sub.unit ? parseUnit(sub.unit) : null;
+  if (reqQty == null) return subQty == null && subUnit == null;
+  return subQty === reqQty && subUnit === reqUnit;
+}
+
+function findActiveSubscription(data, customerId, productId, quantity, unit) {
+  ensureStoreShape(data);
+  return (
+    data.subscriptions.find((s) =>
+      subscriptionMatchesRequest(s, customerId, productId, quantity, unit),
+    ) || null
+  );
+}
+
+/** Whether a low-stock / back-in-stock alert is appropriate for this product/qty. */
+function isNotifyEligible(product, quantity, unit) {
+  const viewed = productView(product);
+  if (viewed.stockStatus === 'low_stock' || viewed.stockStatus === 'out_of_stock') {
+    return { eligible: true, reason: viewed.stockStatus, viewed };
+  }
+  if (quantity != null) {
+    const availability = checkAvailability(product, quantity, unit);
+    if (!availability.canFulfill) {
+      return { eligible: true, reason: 'insufficient_for_request', viewed, availability };
+    }
+  }
+  return { eligible: false, reason: 'sufficient_stock', viewed };
+}
+
+function cancelLowStockSubscription(data, customerId, productId, quantity, unit) {
+  ensureStoreShape(data);
+  const sub = findActiveSubscription(data, customerId, productId, quantity, unit);
+  if (!sub) return null;
+  sub.status = 'cancelled';
+  sub.cancelledAt = new Date().toISOString();
+  return sub;
+}
+
+function upsertLowStockSubscription(data, customer, product, quantity, unit) {
+  ensureStoreShape(data);
+  const customerId = customer.customerId;
+  const productId = product.productId;
+  let sub = findActiveSubscription(data, customerId, productId, quantity, unit);
+  const createdAt = new Date().toISOString();
+  const parsedUnit = unit ? parseUnit(unit) : null;
+  const parsedQty = quantity != null ? Math.floor(Number(quantity)) : null;
+  if (sub) {
+    sub.updatedAt = createdAt;
+    return { subscription: sub, created: false };
+  }
+  sub = {
+    subscriptionId: nextSubscriptionId(data),
+    customerId,
+    accountNumber: customer.accountNumber,
+    phone: customer.phone,
+    productId,
+    productName: product.shortName,
+    quantity: parsedQty,
+    unit: parsedUnit,
+    status: 'active',
+    notifyWhenAvailable: true,
+    createdAt,
+    updatedAt: createdAt,
+  };
+  data.subscriptions.push(sub);
+  return { subscription: sub, created: true };
+}
+
+function subscriptionView(sub) {
+  if (!sub) return null;
+  return {
+    subscriptionId: sub.subscriptionId,
+    customerId: sub.customerId,
+    accountNumber: sub.accountNumber,
+    productId: sub.productId,
+    productName: sub.productName,
+    quantity: sub.quantity,
+    unit: sub.unit,
+    status: sub.status,
+    notifyWhenAvailable: sub.notifyWhenAvailable,
+    createdAt: sub.createdAt,
+    updatedAt: sub.updatedAt,
+    cancelledAt: sub.cancelledAt || null,
+  };
+}
+
 function maskPhone(digits) {
   const d = String(digits || '');
   if (d.length <= 4) return '****';
@@ -490,6 +758,7 @@ module.exports = {
   loadStore,
   saveStore,
   normalizePhone,
+  normalizeCustomerId,
   normalizeKey,
   productView,
   findProduct,
@@ -500,11 +769,26 @@ module.exports = {
   lastOrderForCustomer,
   lastOrderShape,
   verifyStatedLastOrder,
+  statedLastOrderFromInput,
+  openLastOrderVerification,
+  resolveOrCreateCustomerOpen,
+  resolveCustomerForOrderOpen,
   nextCustomerId,
   nextOrderNumber,
+  nextSubscriptionId,
+  ensureStoreShape,
+  findActiveSubscription,
+  isNotifyEligible,
+  cancelLowStockSubscription,
+  upsertLowStockSubscription,
+  subscriptionView,
   maskPhone,
   stockStatusForBags,
   productPricing,
   quoteLine,
   roundMoney,
+  quantityPriceMatrix,
+  productViewWithMatrix,
+  MATRIX_QUANTITIES,
+  MATRIX_UNITS,
 };

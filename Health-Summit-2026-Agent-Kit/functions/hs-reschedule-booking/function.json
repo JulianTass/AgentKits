@@ -1,0 +1,52 @@
+{
+  "name": "hs-reschedule-booking",
+  "description": "Reschedule to one date and time (after 9 June 2026). Requires attendeeId, date, and time.",
+  "handler": "handler.handler",
+  "runtime": "nodejs_22.x",
+  "input": {
+    "type": "object",
+    "required": ["attendeeId", "date", "time"],
+    "properties": {
+      "attendeeId": {
+        "type": "string",
+        "description": "From hs_idv_attendee."
+      },
+      "date": {
+        "type": "string",
+        "description": "Appointment date dd/mm/yyyy (aliases: proposedDate, proposedDate1)."
+      },
+      "time": {
+        "type": "string",
+        "description": "Appointment time HH:mm 24-hour (aliases: proposedTime, proposedTime1)."
+      },
+      "dateTime": {
+        "type": "string",
+        "description": "Optional combined dd/mm/yyyy HH:mm instead of separate date and time."
+      },
+      "bookingReference": {
+        "type": "string",
+        "description": "Optional existing booking to reschedule."
+      },
+      "dob": {
+        "type": "string",
+        "description": "Optional fallback when attendeeId was created on a separate IDV function."
+      },
+      "storePath": { "type": "string" }
+    }
+  },
+  "output": {
+    "type": "object",
+    "properties": {
+      "success": { "type": "boolean" },
+      "attendeeId": { "type": "string" },
+      "appointmentDate": { "type": "string" },
+      "appointmentTime": { "type": "string" },
+      "scheduledStartDisplay": { "type": "string" },
+      "bookingReference": { "type": "string" },
+      "rescheduleStatus": { "type": "string" },
+      "message": { "type": "string" },
+      "error": { "type": "string" },
+      "code": { "type": "string" }
+    }
+  }
+}

@@ -1,6 +1,6 @@
 {
   "name": "ls-get-life-science-products",
-  "description": "Returns life sciences IV fluid products with stock levels and AUD pricing (per bag and per case). With productName and quantity, returns line price—for example 6 bags of Normal Saline. No separate pricing API required.",
+  "description": "Returns life sciences IV fluid products with stock, AUD pricing, and quantityPriceMatrix (line cost and canFulfill for quantities 1–4 in bag and case units). Optional productName and quantity for a specific availability check.",
   "handler": "handler.handler",
   "runtime": "nodejs_22.x",
   "input": {
@@ -32,6 +32,7 @@
       "canFulfill": { "type": "boolean" },
       "lowStock": { "type": "boolean" },
       "pricing": { "type": "object" },
+      "quantityPriceMatrix": { "type": "object" },
       "message": { "type": "string" },
       "error": { "type": "string" },
       "code": { "type": "string" }

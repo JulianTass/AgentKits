@@ -1,0 +1,7 @@
+{
+  "name": "hs-next-available-booking",
+  "version": "1.0.0",
+  "private": true,
+  "main": "handler.js",
+  "engines": { "node": ">=22" }
+}

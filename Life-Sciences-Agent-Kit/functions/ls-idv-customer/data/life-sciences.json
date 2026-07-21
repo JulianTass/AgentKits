@@ -1,7 +1,8 @@
 {
   "meta": {
-    "lastCustomerSeq": 103,
-    "lastOrderSeq": 5002
+    "lastCustomerSeq": 104,
+    "lastOrderSeq": 5002,
+    "lastSubscriptionSeq": 1000
   },
   "products": [
     {
@@ -129,6 +130,21 @@
         "unit": "case",
         "orderedAt": "2026-04-28T11:30:00.000Z"
       }
+    },
+    {
+      "customerId": "LSC-104",
+      "organizationName": "Demo Facility (78343)",
+      "uniqueIdentifier": "UID-LS-078343",
+      "accountNumber": "78343",
+      "phone": "61406910251",
+      "lastOrder": {
+        "orderNumber": "LSO-5000",
+        "productId": "LS-PROD-001",
+        "productName": "Normal Saline",
+        "quantity": 6,
+        "unit": "case",
+        "orderedAt": "2026-05-18T10:00:00.000Z"
+      }
     }
   ],
   "orders": [
@@ -162,5 +178,6 @@
       ],
       "createdAt": "2026-05-15T09:05:00.000Z"
     }
-  ]
+  ],
+  "subscriptions": []
 }

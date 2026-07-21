@@ -1,0 +1,7 @@
+{
+  "name": "hs-idv-attendee",
+  "version": "1.0.0",
+  "private": true,
+  "main": "handler.js",
+  "engines": { "node": ">=22" }
+}

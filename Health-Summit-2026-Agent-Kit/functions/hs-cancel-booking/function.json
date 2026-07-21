@@ -1,0 +1,29 @@
+{
+  "name": "hs-cancel-booking",
+  "description": "Cancels a Health Summit 2026 appointment and returns a cancellation reference ID.",
+  "handler": "handler.handler",
+  "runtime": "nodejs_22.x",
+  "input": {
+    "type": "object",
+    "required": ["attendeeId"],
+    "properties": {
+      "attendeeId": { "type": "string" },
+      "bookingReference": {
+        "type": "string",
+        "description": "Optional. Cancels next active booking if omitted."
+      },
+      "storePath": { "type": "string" }
+    }
+  },
+  "output": {
+    "type": "object",
+    "properties": {
+      "success": { "type": "boolean" },
+      "cancellationReferenceId": { "type": "string" },
+      "bookingReference": { "type": "string" },
+      "message": { "type": "string" },
+      "error": { "type": "string" },
+      "code": { "type": "string" }
+    }
+  }
+}

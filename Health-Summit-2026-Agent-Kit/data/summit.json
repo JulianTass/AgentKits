@@ -1,0 +1,56 @@
+{
+  "meta": {
+    "lastAttendeeSeq": 103,
+    "lastBookingSeq": 2003,
+    "lastCancellationSeq": 3000
+  },
+  "event": {
+    "name": "Health Summit 2026",
+    "venue": "Sydney Convention Centre",
+    "earliestDate": "2026-06-10",
+    "latestDate": "2026-06-20"
+  },
+  "attendees": [
+    {
+      "attendeeId": "HS-ATT-101",
+      "fullName": "Jordan Lee",
+      "dob": "1985-04-22"
+    },
+    {
+      "attendeeId": "HS-ATT-102",
+      "fullName": "Sam Rivera",
+      "dob": "1990-11-08"
+    },
+    {
+      "attendeeId": "HS-ATT-103",
+      "fullName": "Alex Chen",
+      "dob": "1978-06-15"
+    }
+  ],
+  "bookings": [
+    {
+      "bookingId": "HS-BK-2001",
+      "bookingReference": "HS-BK-2001",
+      "attendeeId": "HS-ATT-101",
+      "appointmentType": "Health Summit Session",
+      "scheduledStart": "2026-06-12T10:30:00",
+      "status": "confirmed"
+    },
+    {
+      "bookingId": "HS-BK-2002",
+      "bookingReference": "HS-BK-2002",
+      "attendeeId": "HS-ATT-102",
+      "appointmentType": "Health Summit Session",
+      "scheduledStart": "2026-06-14T14:30:00",
+      "status": "confirmed"
+    },
+    {
+      "bookingId": "HS-BK-2003",
+      "bookingReference": "HS-BK-2003",
+      "attendeeId": "HS-ATT-103",
+      "appointmentType": "Health Summit Session",
+      "scheduledStart": "2026-06-11T09:15:00",
+      "status": "confirmed"
+    }
+  ]
+}

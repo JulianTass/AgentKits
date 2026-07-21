@@ -2,10 +2,10 @@
 
 const {
   loadStore,
-  findCustomer,
-  lastOrderForCustomer,
+  saveStore,
   lastOrderShape,
-  verifyStatedLastOrder,
+  openLastOrderVerification,
+  resolveOrCreateCustomerOpen,
   maskPhone,
 } = require('./lib/lifeSciencesStore');
 const { ok, fail, extractInput } = require('./lib/parseEvent');
@@ -26,14 +26,6 @@ function pickQuantity(input, keys) {
 }
 
 async function run(input) {
-  const uniqueIdentifier = pickStr(input, [
-    'uniqueIdentifier',
-    'UniqueIdentifier',
-    'uniqueId',
-    'UniqueId',
-    'uid',
-    'UID',
-  ]);
   const accountNumber = pickStr(input, [
     'accountNumber',
     'AccountNumber',
@@ -56,7 +48,6 @@ async function run(input) {
     'ani',
     'ANI',
   ]);
-
   const statedLastProduct = pickStr(input, [
     'statedLastProduct',
     'StatedLastProduct',
@@ -83,54 +74,72 @@ async function run(input) {
     'statedUnit',
     'StatedUnit',
   ]);
+  const uniqueIdentifier = pickStr(input, [
+    'uniqueIdentifier',
+    'UniqueIdentifier',
+    'uniqueId',
+    'UniqueId',
+    'uid',
+    'UID',
+  ]);
+  const organizationName = pickStr(input, [
+    'organizationName',
+    'OrganizationName',
+    'customerName',
+    'CustomerName',
+    'facilityName',
+    'FacilityName',
+  ]);
 
-  if (!uniqueIdentifier && !accountNumber && !phone) {
+  const missing = [];
+  if (!accountNumber) missing.push('accountNumber');
+  if (!phone) missing.push('phone');
+  if (!statedLastProduct) missing.push('statedLastProduct');
+  if (statedLastQuantity == null) missing.push('statedLastQuantity');
+  if (!statedLastUnit) missing.push('statedLastUnit');
+
+  if (missing.length) {
     return fail(
-      'Provide at least one identifier: uniqueIdentifier (UID-LS-…), accountNumber (ACC-…), or phone (+61… or 04…).',
-      'MISSING_IDENTIFIER',
+      'Required in one call: accountNumber, phone, statedLastProduct, statedLastQuantity, statedLastUnit (case or bag). Demo mode accepts any values.',
+      'MISSING_REQUIRED_FIELDS',
+      { missing },
     );
   }
 
   const { data } = loadStore(input.storePath);
-  const customer = findCustomer(data, { uniqueIdentifier, phone, accountNumber });
-
-  if (!customer) {
-    return fail(
-      'No unique customer match. Use a combination of unique identifier, account number, and phone that identifies exactly one account.',
-      'IDV_NO_MATCH',
-    );
-  }
-
-  const onFileLast = lastOrderForCustomer(data, customer);
-  const lastOrder = lastOrderShape(onFileLast);
-  const lastOrderVerification = verifyStatedLastOrder(data, onFileLast, {
+  const lastOrderVerification = openLastOrderVerification(data, {
     productName: statedLastProduct,
     quantity: statedLastQuantity,
     unit: statedLastUnit,
   });
 
-  if (lastOrderVerification.match === false) {
-    return fail(
-      'Account found but stated last order does not match our records. Ask the caller to confirm product, quantity, and unit (case or bag).',
-      'IDV_LAST_ORDER_MISMATCH',
-      { lastOrder, lastOrderVerification },
-    );
-  }
+  const customer = resolveOrCreateCustomerOpen(data, {
+    accountNumber,
+    phone,
+    uniqueIdentifier,
+    organizationName,
+  });
+  customer.lastOrder = {
+    ...lastOrderVerification.stated,
+    orderNumber: customer.lastOrder?.orderNumber || `LSO-IDV-${customer.customerId}`,
+  };
+  saveStore(input.storePath, data);
 
-  const pendingVerification = lastOrderVerification.match === null;
+  const lastOrder = lastOrderShape(customer.lastOrder);
 
   return ok({
-    idvStatus: pendingVerification ? 'PENDING_LAST_ORDER' : 'VERIFIED',
+    idvStatus: 'VERIFIED',
+    demoMode: true,
     customerId: customer.customerId,
     organizationName: customer.organizationName,
     uniqueIdentifier: customer.uniqueIdentifier,
     accountNumber: customer.accountNumber,
     maskedPhone: maskPhone(customer.phone),
+    statedLastOrder: lastOrder,
     lastOrder,
     lastOrderVerification,
-    message: pendingVerification
-      ? 'Account matched. Ask what their last order was, then call again with statedLastProduct, statedLastQuantity, and statedLastUnit.'
-      : 'Identity verified: identifiers and stated last order match records.',
+    message:
+      'Identity verified (demo mode). Account number, phone, and stated last order were accepted. Use customerId with ls_confirm_order.',
   });
 }
 

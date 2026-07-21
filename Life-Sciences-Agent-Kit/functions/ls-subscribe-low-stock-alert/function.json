@@ -1,0 +1,67 @@
+{
+  "name": "ls-subscribe-low-stock-alert",
+  "description": "Subscribe or cancel low-stock / back-in-stock alerts for a product. Contact is account number and phone only (no email). Returns product details with stock status.",
+  "handler": "handler.handler",
+  "runtime": "nodejs_22.x",
+  "input": {
+    "type": "object",
+    "required": ["productName"],
+    "properties": {
+      "productName": {
+        "type": "string",
+        "description": "Required. Product to watch (e.g. D5LR, Normal Saline)."
+      },
+      "customerId": {
+        "type": "string",
+        "description": "From ls_idv_customer. Alternative to accountNumber + phone."
+      },
+      "accountNumber": {
+        "type": "string",
+        "description": "Required with phone if customerId omitted."
+      },
+      "phone": {
+        "type": "string",
+        "description": "Required with accountNumber if customerId omitted."
+      },
+      "quantity": {
+        "type": "number",
+        "description": "Optional. Notify when this quantity can be fulfilled."
+      },
+      "unit": {
+        "type": "string",
+        "description": "Optional. bag/case with quantity."
+      },
+      "notifyWhenAvailable": {
+        "type": "boolean",
+        "description": "true (default) to subscribe; false to cancel an active alert."
+      },
+      "organizationName": { "type": "string" },
+      "storePath": { "type": "string" }
+    }
+  },
+  "output": {
+    "type": "object",
+    "properties": {
+      "success": { "type": "boolean" },
+      "demoMode": { "type": "boolean" },
+      "notifyWhenAvailable": { "type": "boolean" },
+      "status": { "type": "string" },
+      "subscriptionId": { "type": "string" },
+      "subscription": { "type": "object" },
+      "customerId": { "type": "string" },
+      "accountNumber": { "type": "string" },
+      "maskedPhone": { "type": "string" },
+      "productName": { "type": "string" },
+      "productId": { "type": "string" },
+      "lowStock": { "type": "boolean" },
+      "stockStatus": { "type": "string" },
+      "stockBags": { "type": "number" },
+      "stockCases": { "type": "number" },
+      "matchedProduct": { "type": "object" },
+      "availabilityCheck": { "type": "object" },
+      "message": { "type": "string" },
+      "error": { "type": "string" },
+      "code": { "type": "string" }
+    }
+  }
+}

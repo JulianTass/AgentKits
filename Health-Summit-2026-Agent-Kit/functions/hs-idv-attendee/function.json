@@ -1,0 +1,34 @@
+{
+  "name": "hs-idv-attendee",
+  "description": "Health Summit 2026 attendee IDV (demo open). Any DOB accepted; booking reference optional and may be empty. Provide DOB and/or booking reference.",
+  "handler": "handler.handler",
+  "runtime": "nodejs_22.x",
+  "input": {
+    "type": "object",
+    "required": [],
+    "properties": {
+      "dob": {
+        "type": "string",
+        "description": "Date of birth (dd/mm/yyyy or yyyy-mm-dd). Any value accepted in demo; used alone when booking reference is empty."
+      },
+      "bookingReference": {
+        "type": "string",
+        "description": "Optional. HS-BK-… booking reference; may be omitted or empty — DOB alone is enough."
+      },
+      "fullName": { "type": "string" },
+      "storePath": { "type": "string" }
+    }
+  },
+  "output": {
+    "type": "object",
+    "properties": {
+      "success": { "type": "boolean" },
+      "idvStatus": { "type": "string" },
+      "attendeeId": { "type": "string" },
+      "fullName": { "type": "string" },
+      "message": { "type": "string" },
+      "error": { "type": "string" },
+      "code": { "type": "string" }
+    }
+  }
+}

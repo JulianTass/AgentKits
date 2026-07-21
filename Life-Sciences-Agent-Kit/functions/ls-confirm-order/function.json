@@ -1,6 +1,6 @@
 {
   "name": "ls-confirm-order",
-  "description": "Confirms a life sciences supply order, decrements stock, and returns orderConfirmationNumber. Requires customerId from IDV or matching identifiers. Rejects lines that exceed available stock.",
+  "description": "Confirms a life sciences supply order (demo/open mode). Accepts customerId from ls_idv_customer even when that customer was created in a separate function deployment; optionally accountNumber and phone. Returns orderConfirmationNumber, orderTotalDisplay, and productName at root for Genesys translation maps.",
   "handler": "handler.handler",
   "runtime": "nodejs_22.x",
   "input": {
@@ -32,6 +32,13 @@
       "orderStatus": { "type": "string" },
       "customerId": { "type": "string" },
       "organizationName": { "type": "string" },
+      "accountNumber": { "type": "string" },
+      "orderTotalAud": { "type": "number" },
+      "orderTotalDisplay": { "type": "string" },
+      "productName": { "type": "string" },
+      "quantity": { "type": "number" },
+      "unit": { "type": "string" },
+      "demoMode": { "type": "boolean" },
       "lines": { "type": "array" },
       "estimatedDeliveryWindow": { "type": "string" },
       "message": { "type": "string" },

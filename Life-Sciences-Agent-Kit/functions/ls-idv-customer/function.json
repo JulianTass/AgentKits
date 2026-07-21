@@ -1,34 +1,45 @@
 {
   "name": "ls-idv-customer",
-  "description": "Verifies an existing life sciences customer by unique identifier, account number, and/or phone. Returns last ordered product history for reorder context.",
+  "description": "Life sciences customer IDV (demo/open mode). Requires accountNumber, phone, statedLastProduct, statedLastQuantity, and statedLastUnit in one call. Any values are accepted and return VERIFIED.",
   "handler": "handler.handler",
   "runtime": "nodejs_22.x",
   "input": {
     "type": "object",
+    "required": [
+      "accountNumber",
+      "phone",
+      "statedLastProduct",
+      "statedLastQuantity",
+      "statedLastUnit"
+    ],
     "properties": {
-      "uniqueIdentifier": {
-        "type": "string",
-        "description": "Customer unique ID (e.g. UID-LS-0042). Aliases: uniqueId, uid."
-      },
       "accountNumber": {
         "type": "string",
-        "description": "Account / unique number (e.g. ACC-88421). Aliases: uniqueNumber, customerNumber."
+        "description": "Required. Any account number accepted in demo mode. Aliases: uniqueNumber, customerNumber."
       },
       "phone": {
         "type": "string",
-        "description": "Australian mobile +61 4… or 04…. Aliases: phoneNumber, mobile, ani."
+        "description": "Required. Any phone (+61 4… or 04…). Aliases: phoneNumber, mobile, ani."
       },
       "statedLastProduct": {
         "type": "string",
-        "description": "What the caller says they last ordered (e.g. Normal Saline). Compared to on-file lastOrder for IDV. Aliases: lastOrderProduct, statedProductName."
+        "description": "Required. What the caller says they last ordered. Any product name accepted. Aliases: lastOrderProduct, statedProductName."
       },
       "statedLastQuantity": {
         "type": "number",
-        "description": "Quantity the caller states for last order. Aliases: lastOrderQuantity, statedQuantity."
+        "description": "Required. Last order quantity. Aliases: lastOrderQuantity, statedQuantity."
       },
       "statedLastUnit": {
         "type": "string",
-        "description": "case/cases or bag/bags for stated last order. Aliases: lastOrderUnit, statedUnit."
+        "description": "Required. case/cases or bag/bags. Aliases: lastOrderUnit, statedUnit."
+      },
+      "uniqueIdentifier": {
+        "type": "string",
+        "description": "Optional. Assigned automatically if omitted. Aliases: uniqueId, uid."
+      },
+      "organizationName": {
+        "type": "string",
+        "description": "Optional facility name. Aliases: customerName, facilityName."
       },
       "storePath": { "type": "string" }
     }
@@ -38,11 +49,13 @@
     "properties": {
       "success": { "type": "boolean" },
       "idvStatus": { "type": "string" },
+      "demoMode": { "type": "boolean" },
       "customerId": { "type": "string" },
       "organizationName": { "type": "string" },
       "uniqueIdentifier": { "type": "string" },
       "accountNumber": { "type": "string" },
       "maskedPhone": { "type": "string" },
+      "statedLastOrder": { "type": "object" },
       "lastOrder": { "type": "object" },
       "lastOrderVerification": { "type": "object" },
       "message": { "type": "string" },

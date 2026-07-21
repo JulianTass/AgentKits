@@ -2,9 +2,9 @@
 
 const {
   loadStore,
-  productView,
   findProduct,
   checkAvailability,
+  productViewWithMatrix,
 } = require('./lib/lifeSciencesStore');
 const { ok, fail, extractInput } = require('./lib/parseEvent');
 
@@ -40,7 +40,7 @@ async function run(input) {
   const quantity = pickQuantity(input);
   const unit = pickStr(input, ['unit', 'Unit', 'uom', 'UOM']);
 
-  const catalog = data.products.map(productView);
+  const catalog = data.products.map(productViewWithMatrix);
   const lowStockProducts = catalog.filter((p) => p.lowStock);
   const outOfStockProducts = catalog.filter((p) => p.stockStatus === 'out_of_stock');
 
@@ -51,7 +51,7 @@ async function run(input) {
       lowStockProducts,
       outOfStockProducts,
       message:
-        'Life sciences IV fluid catalog. Pass productName (e.g. Normal Saline, D5LR) with quantity and unit (case or bag) to check stock for an order.',
+        'Life sciences IV fluid catalog with quantityPriceMatrix (qty 1–4 for bag and case). Pass productName with optional quantity and unit for a specific check.',
     });
   }
 
@@ -64,11 +64,12 @@ async function run(input) {
     );
   }
 
-  const viewed = productView(product);
+  const viewed = productViewWithMatrix(product);
   if (quantity == null) {
     return ok({
       matchedProduct: viewed,
       products: [viewed],
+      quantityPriceMatrix: viewed.quantityPriceMatrix,
       pricing: {
         currency: viewed.currency,
         unitPriceAud: viewed.unitPriceAud,
@@ -77,8 +78,8 @@ async function run(input) {
       },
       lowStock: viewed.lowStock,
       message: viewed.lowStock
-        ? `${viewed.shortName} is low stock (${viewed.stockBags} bags / ${viewed.stockCases} cases on hand). Price: ${viewed.unitPriceAud} AUD per bag, ${viewed.pricePerCaseAud} AUD per case.`
-        : `${viewed.shortName} is ${viewed.stockStatus} (${viewed.stockBags} bags on hand). Price: ${viewed.unitPriceAud} AUD per bag, ${viewed.pricePerCaseAud} AUD per case.`,
+        ? `${viewed.shortName} is low stock (${viewed.stockBags} bags / ${viewed.stockCases} cases on hand). Price: ${viewed.unitPriceAud} AUD per bag, ${viewed.pricePerCaseAud} AUD per case. See quantityPriceMatrix for qty 1–4.`
+        : `${viewed.shortName} is ${viewed.stockStatus} (${viewed.stockBags} bags on hand). Price: ${viewed.unitPriceAud} AUD per bag, ${viewed.pricePerCaseAud} AUD per case. See quantityPriceMatrix for qty 1–4.`,
     });
   }
 
@@ -86,6 +87,7 @@ async function run(input) {
   return ok({
     matchedProduct: viewed,
     availabilityCheck: availability,
+    quantityPriceMatrix: viewed.quantityPriceMatrix,
     pricing: availability.pricing,
     lowStock: viewed.lowStock,
     canFulfill: availability.canFulfill,

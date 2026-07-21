@@ -3,13 +3,14 @@
 const {
   loadStore,
   saveStore,
-  findCustomer,
   findProduct,
   checkAvailability,
   quoteLine,
   roundMoney,
   nextOrderNumber,
   productView,
+  resolveCustomerForOrderOpen,
+  normalizeCustomerId,
 } = require('./lib/lifeSciencesStore');
 const { ok, fail, extractInput } = require('./lib/parseEvent');
 
@@ -21,6 +22,13 @@ function pickStr(input, keys) {
   return '';
 }
 
+function pickQuantity(input, keys) {
+  const raw = keys.reduce((acc, k) => (acc != null ? acc : input[k]), null);
+  if (raw == null || String(raw).trim() === '') return null;
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : null;
+}
+
 function parseLineItems(input) {
   const raw = input.lineItems ?? input.LineItems ?? input.items ?? input.Items ?? input.orderLines;
   if (Array.isArray(raw) && raw.length) {
@@ -29,50 +37,18 @@ function parseLineItems(input) {
   const productName = pickStr(input, [
     'productName',
     'ProductName',
+    'productName_ls',
     'product',
     'Product',
     'productId',
     'ProductId',
   ]);
-  const quantity = input.quantity ?? input.Quantity ?? input.qty;
-  const unit = pickStr(input, ['unit', 'Unit']);
+  const quantity = pickQuantity(input, ['quantity', 'Quantity', 'qty', 'Qty', 'quantity_stock_ls']);
+  const unit = pickStr(input, ['unit', 'Unit', 'unit_ls']);
   if (productName && quantity != null) {
     return [{ productName, quantity, unit }];
   }
   return [];
-}
-
-function resolveCustomer(data, input) {
-  const customerId = pickStr(input, ['customerId', 'CustomerId']);
-  if (customerId) {
-    const existing = data.customers.find((c) => c.customerId === customerId);
-    if (existing) return existing;
-    return fail(`Unknown customerId: ${customerId}`, 'UNKNOWN_CUSTOMER');
-  }
-  const customer = findCustomer(data, {
-    uniqueIdentifier: pickStr(input, [
-      'uniqueIdentifier',
-      'UniqueIdentifier',
-      'uniqueId',
-      'UniqueId',
-      'uid',
-    ]),
-    accountNumber: pickStr(input, [
-      'accountNumber',
-      'AccountNumber',
-      'uniqueNumber',
-      'UniqueNumber',
-      'customerNumber',
-    ]),
-    phone: pickStr(input, ['phone', 'Phone', 'phoneNumber', 'PhoneNumber', 'mobile']),
-  });
-  if (!customer) {
-    return fail(
-      'Customer not found. Run ls_idv_customer first or pass customerId plus verified identifiers.',
-      'CUSTOMER_NOT_FOUND',
-    );
-  }
-  return customer;
 }
 
 async function run(input) {
@@ -84,10 +60,60 @@ async function run(input) {
     );
   }
 
+  const customerId = normalizeCustomerId(
+    pickStr(input, ['customerId', 'CustomerId', 'customer_id', 'CustomerID', 'customerId_ls']),
+  );
+  const accountNumber = pickStr(input, [
+    'accountNumber',
+    'AccountNumber',
+    'accountNumber_ls',
+    'uniqueNumber',
+    'UniqueNumber',
+    'customerNumber',
+  ]);
+  const phone = pickStr(input, [
+    'phone',
+    'Phone',
+    'phone_ls',
+    'phoneNumber',
+    'PhoneNumber',
+    'mobile',
+    'CallerPhone',
+  ]);
+
+  if (!customerId && !(accountNumber && phone)) {
+    return fail(
+      'Provide customerId from ls_idv_customer, or accountNumber and phone together.',
+      'MISSING_CUSTOMER',
+    );
+  }
+
   const { data } = loadStore(input.storePath);
-  const customerResult = resolveCustomer(data, input);
-  if (customerResult.success === false) return customerResult;
-  const customer = customerResult;
+  const customer = resolveCustomerForOrderOpen(data, {
+    customerId,
+    accountNumber,
+    phone,
+    organizationName: pickStr(input, [
+      'organizationName',
+      'OrganizationName',
+      'organizationName_ls',
+      'customerName',
+      'FacilityName',
+    ]),
+    uniqueIdentifier: pickStr(input, [
+      'uniqueIdentifier',
+      'UniqueIdentifier',
+      'uniqueId',
+      'UniqueId',
+    ]),
+  });
+
+  if (!customer) {
+    return fail(
+      'Could not resolve customer. Pass customerId from IDV or accountNumber with phone.',
+      'CUSTOMER_NOT_FOUND',
+    );
+  }
 
   const resolvedLines = [];
   const stockIssues = [];
@@ -103,7 +129,10 @@ async function run(input) {
       'name',
       'Name',
     ]);
-    const quantity = row.quantity ?? row.Quantity ?? row.qty;
+    const quantity = pickQuantity(row, ['quantity', 'Quantity', 'qty', 'Qty']);
+    if (quantity == null) {
+      return fail('Each order line needs a positive quantity.', 'MISSING_QUANTITY');
+    }
     const unit = pickStr(row, ['unit', 'Unit']) || 'bag';
     const product = findProduct(data, productName);
     if (!product) {
@@ -152,8 +181,9 @@ async function run(input) {
     };
   });
   const orderTotalAud = roundMoney(orderLines.reduce((sum, l) => sum + l.lineTotalAud, 0));
+  const primary = orderLines[0];
 
-  const order = {
+  data.orders.push({
     orderNumber,
     orderConfirmationNumber: orderNumber,
     customerId: customer.customerId,
@@ -161,10 +191,8 @@ async function run(input) {
     status: 'confirmed',
     lines: orderLines,
     createdAt,
-  };
+  });
 
-  data.orders.push(order);
-  const primary = orderLines[0];
   customer.lastOrder = {
     orderNumber,
     productId: primary.productId,
@@ -179,11 +207,17 @@ async function run(input) {
     orderConfirmationNumber: orderNumber,
     orderNumber,
     orderStatus: 'confirmed',
+    demoMode: true,
+    demoOpenConfirm: true,
     customerId: customer.customerId,
     organizationName: customer.organizationName,
+    accountNumber: customer.accountNumber,
     currency: orderLines[0]?.currency || 'AUD',
     orderTotalAud,
     orderTotalDisplay: `AUD $${orderTotalAud.toFixed(2)}`,
+    productName: primary.productName,
+    quantity: primary.quantity,
+    unit: primary.unit,
     lines: orderLines.map((l) => ({
       ...l,
       productStockAfterOrder: productView(

@@ -1,0 +1,25 @@
+{
+  "name": "hs-next-available-booking",
+  "description": "Returns the attendee's next Health Summit appointment. Only dates after 9 June 2026 are provided.",
+  "handler": "handler.handler",
+  "runtime": "nodejs_22.x",
+  "input": {
+    "type": "object",
+    "required": ["attendeeId"],
+    "properties": {
+      "attendeeId": { "type": "string", "description": "From hs_idv_attendee." },
+      "storePath": { "type": "string" }
+    }
+  },
+  "output": {
+    "type": "object",
+    "properties": {
+      "success": { "type": "boolean" },
+      "bookingReference": { "type": "string" },
+      "scheduledStartDisplay": { "type": "string" },
+      "message": { "type": "string" },
+      "error": { "type": "string" },
+      "code": { "type": "string" }
+    }
+  }
+}

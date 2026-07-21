@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Healthcare Portal</title>
+  <link rel="stylesheet" href="/css/styles.css" />
+  <script src="https://global.oktacdn.com/okta-auth-js/7.5.1/okta-auth-js.min.js"></script>
+  <script src="/js/providers.js"></script>
+  <script src="/js/genesys-domains.js"></script>
+  <script src="/js/auth.js"></script>
+  <script>
+    (function () {
+      var provider = window.PortalAuth.getProvider();
+      window.PortalAuth.bootstrapGenesys(provider);
+      window.__portalAuthController = window.PortalAuth.initPortalAuth(function (state) {
+        if (window.__updateAuthUi) window.__updateAuthUi(state);
+      });
+    })();
+  </script>
+</head>
+<body>
+  <header>
+    <div class="brand" id="brandName">Healthcare Portal</div>
+    <div class="header-actions">
+      <label class="provider-picker">
+        Provider
+        <select id="providerSelect" aria-label="Select healthcare provider"></select>
+      </label>
+      <span id="authLoading">Signing in…</span>
+      <button type="button" id="loginBtn">Log In</button>
+      <button type="button" id="logoutBtn">Log Out</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="hero">
+      <h1 id="heroTitle">Welcome</h1>
+      <p id="heroDescription">Sign in to start an authenticated chat session.</p>
+    </div>
+    <div id="userStatus">Not signed in</div>
+
+    <div class="info-card">
+      <h3 id="infoTitle">Authenticated messaging</h3>
+      <p id="infoBody">
+        Login uses Okta PKCE. The authorization code is passed to Genesys via
+        <code>AuthProvider.getAuthCode</code> — not the ID token.
+      </p>
+    </div>
+  </main>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>
