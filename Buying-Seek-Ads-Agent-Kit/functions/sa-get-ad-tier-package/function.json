@@ -1,30 +1,35 @@
 {
   "name": "sa-get-ad-tier-package",
-  "description": "Returns Seek branded ad budget package details for Occasional (2–3 ads), Regular (4–6 ads), or Frequent (6–10 ads) hiring tiers. Pass tier and/or adCount; validates ad count against tier rules and returns budget, discounts, eligible ad types, and summary text.",
+  "description": "Recommends the best Seek branded ad budget package from the caller's identity and how many ads they need. Pass advertiserId (from IDV) and adCount (2–10); maps to Occasional, Regular, or Frequent and returns budget, discounts, and summary text.",
   "handler": "handler.handler",
   "runtime": "nodejs_22.x",
   "input": {
     "type": "object",
     "properties": {
-      "tier": {
-        "type": "string",
-        "description": "Hiring tier: occasional, regular, or frequent. Aliases: hiringTier, adTier, packageTier."
-      },
       "adCount": {
         "type": "number",
-        "description": "Number of job ads (2–10). Maps to tier when tier omitted: 2–3 occasional, 4–6 regular, 6–10 frequent. Aliases: numberOfAds, jobAdCount, ads."
+        "title": "Number of job ads",
+        "description": "Required. Number of job ads (2–10). Auto-selects best tier: 2–3 occasional, 4–6 regular, 6–10 frequent."
       },
       "advertiserId": {
         "type": "string",
-        "description": "Optional. advertiserId from sa_idv_advertiser."
+        "title": "Advertiser ID",
+        "description": "Required. advertiserId from sa_idv_advertiser (caller identity)."
       },
       "seekId": {
         "type": "string",
-        "description": "Optional. 6-character Seek PIN to attach advertiser context."
+        "title": "Seek ID",
+        "description": "Optional fallback if advertiserId is unavailable."
+      },
+      "tier": {
+        "type": "string",
+        "title": "Hiring tier",
+        "description": "Optional override. Usually omit — adCount selects the best package."
       },
       "listTiers": {
         "type": "boolean",
-        "description": "If true, returns all tier options without package detail."
+        "title": "List all tiers",
+        "description": "Optional. If true, lists tiers only (do not use for package recommendation)."
       },
       "storePath": { "type": "string" }
     }
@@ -32,29 +37,30 @@
   "output": {
     "type": "object",
     "properties": {
-      "success": { "type": "boolean" },
-      "tier": { "type": "string" },
-      "tierLabel": { "type": "string" },
-      "adRangeDisplay": { "type": "string" },
-      "adCount": { "type": "number" },
-      "cardPriceDisplay": { "type": "string" },
-      "recommendedBudgetAud": { "type": "number" },
-      "recommendedBudgetDisplay": { "type": "string" },
-      "currency": { "type": "string" },
-      "discounts": { "type": "array" },
-      "brandedAdBudget": { "type": "object" },
-      "eligibleAdTypes": { "type": "array" },
-      "howItWorks": { "type": "array" },
-      "termsNote": { "type": "string" },
-      "summaryText": { "type": "string" },
-      "openingLine": { "type": "string" },
-      "advertiserId": { "type": "string" },
-      "companyName": { "type": "string" },
-      "availableTiers": { "type": "array" },
-      "message": { "type": "string" },
-      "details": { "type": "object" },
-      "error": { "type": "string" },
-      "code": { "type": "string" }
+      "success": { "type": "boolean", "title": "Success" },
+      "tier": { "type": "string", "title": "Recommended tier" },
+      "tierLabel": { "type": "string", "title": "Tier label" },
+      "adRangeDisplay": { "type": "string", "title": "Ad range" },
+      "adCount": { "type": "number", "title": "Number of job ads" },
+      "cardPriceDisplay": { "type": "string", "title": "Card price" },
+      "recommendedBudgetAud": { "type": "number", "title": "Recommended budget (AUD)" },
+      "recommendedBudgetDisplay": { "type": "string", "title": "Recommended budget" },
+      "summaryText": { "type": "string", "title": "Package recommendation" },
+      "advertiserId": { "type": "string", "title": "Advertiser ID" },
+      "companyName": { "type": "string", "title": "Company name" },
+      "currency": { "type": "string", "title": "Currency" },
+      "discounts": { "type": "array", "title": "Discounts" },
+      "brandedAdBudget": { "type": "object", "title": "Branded ad budget" },
+      "eligibleAdTypes": { "type": "array", "title": "Eligible ad types" },
+      "howItWorks": { "type": "array", "title": "How it works" },
+      "termsNote": { "type": "string", "title": "Terms note" },
+      "openingLine": { "type": "string", "title": "Opening line" },
+      "seekId": { "type": "string", "title": "Seek ID" },
+      "availableTiers": { "type": "array", "title": "Available tiers" },
+      "message": { "type": "string", "title": "Message" },
+      "details": { "type": "object", "title": "Details" },
+      "error": { "type": "string", "title": "Error" },
+      "code": { "type": "string", "title": "Error code" }
     }
   }
 }

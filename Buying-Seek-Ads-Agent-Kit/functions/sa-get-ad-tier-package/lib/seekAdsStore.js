@@ -59,8 +59,9 @@ const TERMS_NOTE =
 
 function defaultData() {
   return {
-    meta: { lastAdvertiserSeq: 100 },
+    meta: { lastAdvertiserSeq: 100, lastOrderSeq: 1000 },
     advertisers: [],
+    orders: [],
   };
 }
 
@@ -111,7 +112,34 @@ function loadStore(storePath) {
     return { path: p, data: seed };
   }
   const data = JSON.parse(fs.readFileSync(p, 'utf8'));
+  // Re-apply bundled seed profiles so zip updates (e.g. contact renames) win over
+  // stale /tmp copies left from earlier deploys on Genesys/Lambda.
+  syncSeedAdvertisersIntoStore(data);
   return { path: p, data };
+}
+
+function syncSeedAdvertisersIntoStore(data) {
+  if (!data || !Array.isArray(data.advertisers)) return;
+  const seeds = bundledSeedAdvertisers();
+  for (const seed of seeds) {
+    const seekId = normalizeSeekId(seed.seekId);
+    const existing = data.advertisers.find((a) => normalizeSeekId(a.seekId) === seekId);
+    if (existing) {
+      existing.companyName = seed.companyName;
+      existing.contactName = seed.contactName;
+      if (seed.phone) existing.phone = seed.phone;
+      if (seed.advertiserId) existing.advertiserId = seed.advertiserId;
+    } else {
+      data.advertisers.push({ ...seed });
+    }
+  }
+  if (data.meta && typeof data.meta.lastAdvertiserSeq === 'number') {
+    const maxSeq = data.advertisers.reduce((max, a) => {
+      const m = String(a.advertiserId || '').match(/(\d+)$/);
+      return m ? Math.max(max, Number(m[1])) : max;
+    }, data.meta.lastAdvertiserSeq);
+    data.meta.lastAdvertiserSeq = maxSeq;
+  }
 }
 
 function saveStore(storePath, data) {
@@ -377,6 +405,121 @@ function listAllTiers() {
   }));
 }
 
+function findAdvertiserById(data, advertiserId) {
+  const id = normalizeAdvertiserId(advertiserId);
+  if (!id) return null;
+  const inStore = (data.advertisers || []).find(
+    (a) => normalizeAdvertiserId(a.advertiserId) === id,
+  );
+  if (inStore) return inStore;
+  return bundledSeedAdvertisers().find((a) => normalizeAdvertiserId(a.advertiserId) === id) || null;
+}
+
+/**
+ * Demo/open order confirm: accept advertiserId from a prior IDV call even when this
+ * function instance has a fresh store (separate Genesys zip deployments).
+ * SA-ADV-101..103 resolve from seed; any other SA-ADV-* from IDV is registered here.
+ */
+function resolveAdvertiserForOrderOpen(data, fields) {
+  const advertiserId = fields.advertiserId ? normalizeAdvertiserId(fields.advertiserId) : '';
+  const seekId = fields.seekId ? normalizeSeekId(fields.seekId) : '';
+  const companyName = fields.companyName || '';
+  const contactName = fields.contactName || '';
+  const phone = fields.phone ? normalizePhone(fields.phone) : '';
+
+  if (advertiserId) {
+    let advertiser = findAdvertiserById(data, advertiserId);
+    if (advertiser) {
+      if (advertiser && !data.advertisers.some((a) => a.advertiserId === advertiser.advertiserId)) {
+        data.advertisers.push({ ...advertiser });
+        advertiser = data.advertisers[data.advertisers.length - 1];
+      }
+      if (companyName) advertiser.companyName = companyName;
+      if (contactName) advertiser.contactName = contactName;
+      if (phone) advertiser.phone = phone;
+      if (seekId) advertiser.seekId = seekId;
+      return advertiser;
+    }
+
+    // Cross-function IDV id (e.g. SA-ADV-104) — not in this zip's store yet.
+    const demo = seekId
+      ? demoProfileForSeekId(seekId)
+      : {
+          companyName: 'Seek Advertiser',
+          contactName: 'Advertiser Contact',
+          phone: '',
+        };
+    advertiser = {
+      advertiserId,
+      companyName: companyName || demo.companyName,
+      seekId: seekId || `OPEN${String(advertiserId).replace(/\D/g, '').slice(-4) || '0000'}`.slice(0, 6),
+      contactName: contactName || demo.contactName,
+      phone: phone || demo.phone || '',
+    };
+    if (!Array.isArray(data.advertisers)) data.advertisers = [];
+    data.advertisers.push(advertiser);
+    const seqMatch = advertiserId.match(/(\d+)$/);
+    if (seqMatch && data.meta) {
+      const seq = Number(seqMatch[1]);
+      if (Number.isFinite(seq) && seq > (data.meta.lastAdvertiserSeq || 0)) {
+        data.meta.lastAdvertiserSeq = seq;
+      }
+    }
+    return advertiser;
+  }
+
+  if (seekId) {
+    return resolveOrCreateAdvertiserOpen(data, {
+      seekId,
+      companyName,
+      contactName,
+      phone,
+    });
+  }
+
+  return null;
+}
+
+function nextOrderNumber(data) {
+  if (!data.meta) data.meta = {};
+  if (typeof data.meta.lastOrderSeq !== 'number') data.meta.lastOrderSeq = 1000;
+  data.meta.lastOrderSeq += 1;
+  return `SA-ORD-${data.meta.lastOrderSeq}`;
+}
+
+function createAdOrder(data, { advertiser, packageDetails }) {
+  if (!Array.isArray(data.orders)) data.orders = [];
+  const orderNumber = nextOrderNumber(data);
+  const order = {
+    orderNumber,
+    orderStatus: 'on_the_way',
+    orderStatusLabel: 'On the way',
+    createdAt: new Date().toISOString(),
+    advertiserId: advertiser.advertiserId,
+    companyName: advertiser.companyName,
+    contactName: advertiser.contactName,
+    seekId: advertiser.seekId,
+    tier: packageDetails.tier,
+    tierLabel: packageDetails.tierLabel,
+    adCount: packageDetails.adCount,
+    adRangeDisplay: packageDetails.adRangeDisplay,
+    recommendedBudgetAud: packageDetails.recommendedBudgetAud,
+    recommendedBudgetDisplay: packageDetails.recommendedBudgetDisplay,
+    cardPriceDisplay: packageDetails.cardPriceDisplay,
+  };
+  data.orders.push(order);
+  return order;
+}
+
+function findOrderByNumber(data, orderNumber) {
+  const id = String(orderNumber || '')
+    .trim()
+    .toUpperCase()
+    .replace(/\s+/g, '');
+  if (!id) return null;
+  return (data.orders || []).find((o) => String(o.orderNumber || '').toUpperCase() === id) || null;
+}
+
 module.exports = {
   TIER_DEFINITIONS,
   loadStore,
@@ -388,11 +531,16 @@ module.exports = {
   isValidMobileConfirmationCode,
   isValidSeekId,
   findAdvertiserBySeekId,
+  findAdvertiserById,
   resolveOrCreateAdvertiserOpen,
+  resolveAdvertiserForOrderOpen,
   maskPhone,
   tierFromAdCount,
   adCountFitsTier,
   recommendedBudgetAud,
   buildPackageSummary,
   listAllTiers,
+  nextOrderNumber,
+  createAdOrder,
+  findOrderByNumber,
 };

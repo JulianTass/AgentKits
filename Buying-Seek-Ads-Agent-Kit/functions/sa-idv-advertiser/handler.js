@@ -118,7 +118,7 @@ async function run(input) {
     seekId: advertiser.seekId,
     maskedPhone: advertiser.phone ? maskPhone(advertiser.phone) : null,
     message:
-      'Identity verified (demo mode). The 4-digit mobile confirmation code and 6-character Seek ID were accepted. Use seekId with sa_get_ad_tier_package.',
+      'Identity verified (demo mode). The 4-digit mobile confirmation code and 6-character Seek ID were accepted. Use advertiserId with sa_get_ad_tier_package.',
   });
 }
 

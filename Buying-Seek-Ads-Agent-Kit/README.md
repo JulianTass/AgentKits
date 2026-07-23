@@ -1,13 +1,14 @@
 # Buying Seek Ads Agent Kit
 
-Genesys-friendly Node.js 22 Cloud Functions for **Seek** employer identity verification and **branded ad budget** tier packages (Occasional, Regular, Frequent hiring).
+Genesys-friendly Node.js 22 Cloud Functions for **Seek** employer identity verification, **branded ad budget** package recommendation, and **order confirmation**.
 
 ## Functions
 
 | Function | Genesys tool name (suggested) | Purpose |
 |----------|-------------------------------|---------|
-| `sa-idv-advertiser` | `sa_idv_advertiser` | Verify advertiser: **4-digit mobile confirmation code** (sent to Seek app) + **6-character Seek ID PIN** |
-| `sa-get-ad-tier-package` | `sa_get_ad_tier_package` | Return tier package details — budget, discounts, eligible ad types, and summary text |
+| `sa-idv-advertiser` | `sa_idv_advertiser` | Verify advertiser: **4-digit mobile confirmation code** + **6-character Seek ID PIN** |
+| `sa-get-ad-tier-package` | `sa_get_ad_tier_package` | Recommend package from `advertiserId` + `adCount` |
+| `sa-confirm-ad-order` | `sa_confirm_ad_order` | Confirm order → **`orderNumber`** with status **on the way** |
 
 ## Hiring tiers
 
@@ -23,7 +24,7 @@ Genesys-friendly Node.js 22 Cloud Functions for **Seek** employer identity verif
 
 | Company | Seek ID | Contact |
 |---------|---------|---------|
-| Harbour City Medical Group | `HC4MG2` | Priya Sharma |
+| Harbour City Medical Group | `HC4MG2` | Sarah Johnson |
 | Northside Aged Care | `NSAC88` | James O'Brien |
 | Bright Future Early Learning | `BFEL01` | Mia Chen |
 
@@ -40,19 +41,25 @@ Demo mode accepts **any valid 4-digit mobile code** and **any 6-character Seek P
 }
 ```
 
-2. **Tier package** — by tier name or ad count:
+2. **Recommend package** — pass `advertiserId` from IDV + how many ads:
 
 ```json
-{ "tier": "frequent", "adCount": 10, "advertiserId": "SA-ADV-101" }
+{
+  "adCount": 5,
+  "advertiserId": "SA-ADV-101"
+}
 ```
 
-Or auto-map from ad count:
+3. **Confirm order** — same identity + ad count:
 
 ```json
-{ "adCount": 3 }
+{
+  "adCount": 5,
+  "advertiserId": "SA-ADV-101"
+}
 ```
 
-Response includes `summaryText` matching the Seek branded ad budget detail screen (discounts, 12-month budget, eligible ad types, how it works, terms note).
+Returns e.g. `orderNumber: "SA-ORD-1001"`, `orderStatus: "on_the_way"`, plus package and contact (`Sarah Johnson`).
 
 ## Build and test
 
@@ -67,6 +74,7 @@ npm run verify:zip
 
 - `dist/sa-idv-advertiser.zip`
 - `dist/sa-get-ad-tier-package.zip`
+- `dist/sa-confirm-ad-order.zip`
 - `dist/Buying-Seek-Ads-Agent-Kit-All-Functions-Source.zip`
 
 Runtime: **nodejs_22.x**, handler: **handler.handler**

@@ -1,13 +1,14 @@
 {
   "meta": {
-    "lastAdvertiserSeq": 103
+    "lastAdvertiserSeq": 103,
+    "lastOrderSeq": 1000
   },
   "advertisers": [
     {
       "advertiserId": "SA-ADV-101",
       "companyName": "Harbour City Medical Group",
       "seekId": "HC4MG2",
-      "contactName": "Priya Sharma",
+      "contactName": "Sarah Johnson",
       "phone": "61400111222"
     },
     {
@@ -24,5 +25,6 @@
       "contactName": "Mia Chen",
       "phone": "61455667788"
     }
-  ]
+  ],
+  "orders": []
 }

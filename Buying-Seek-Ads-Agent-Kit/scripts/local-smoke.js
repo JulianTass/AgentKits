@@ -9,6 +9,7 @@ process.env.SEEK_ADS_STORE_PATH = tmp;
 
 const idv = require('../functions/sa-idv-advertiser/handler');
 const tierPkg = require('../functions/sa-get-ad-tier-package/handler');
+const confirmOrder = require('../functions/sa-confirm-ad-order/handler');
 
 async function main() {
   if (fs.existsSync(tmp)) fs.unlinkSync(tmp);
@@ -24,7 +25,12 @@ async function main() {
   }
 
   const idvSeed = await idv.run({ mobileConfirmationCode: '4829', seekId: 'HC4MG2' });
-  if (!idvSeed.success || idvSeed.idvStatus !== 'VERIFIED' || idvSeed.advertiserId !== 'SA-ADV-101') {
+  if (
+    !idvSeed.success ||
+    idvSeed.idvStatus !== 'VERIFIED' ||
+    idvSeed.advertiserId !== 'SA-ADV-101' ||
+    idvSeed.contactName !== 'Sarah Johnson'
+  ) {
     throw new Error(`Seed IDV: ${JSON.stringify(idvSeed)}`);
   }
 
@@ -78,13 +84,49 @@ async function main() {
     throw new Error(`List tiers: ${JSON.stringify(listTiers)}`);
   }
 
+  const order = await confirmOrder.run({
+    advertiserId: idvSeed.advertiserId,
+    adCount: 5,
+  });
+  if (
+    !order.success ||
+    !/^SA-ORD-\d+$/.test(order.orderNumber) ||
+    order.orderStatus !== 'on_the_way' ||
+    order.contactName !== 'Sarah Johnson' ||
+    order.tier !== 'regular' ||
+    order.recommendedBudgetAud !== 1990
+  ) {
+    throw new Error(`Confirm order: ${JSON.stringify(order)}`);
+  }
+
+  // Cross-function IDV id (not in seed) must still confirm — separate Genesys zips.
+  const crossFn = await confirmOrder.run({
+    advertiserId: 'SA-ADV-104',
+    adCount: 3,
+    companyName: 'Cross Function Pty Ltd',
+    contactName: 'Sam Lee',
+  });
+  if (
+    !crossFn.success ||
+    crossFn.advertiserId !== 'SA-ADV-104' ||
+    !/^SA-ORD-\d+$/.test(crossFn.orderNumber) ||
+    crossFn.orderStatus !== 'on_the_way' ||
+    crossFn.tier !== 'occasional'
+  ) {
+    throw new Error(`Cross-function order: ${JSON.stringify(crossFn)}`);
+  }
+
   console.log(
     JSON.stringify(
       {
         idvSeed: idvSeed.advertiserId,
+        contactName: idvSeed.contactName,
         occasionalBudget: occasional.recommendedBudgetDisplay,
         regularBudget: regular.recommendedBudgetDisplay,
         frequentBudget: frequent.recommendedBudgetDisplay,
+        orderNumber: order.orderNumber,
+        orderStatus: order.orderStatus,
+        crossFnOrder: crossFn.orderNumber,
       },
       null,
       2,

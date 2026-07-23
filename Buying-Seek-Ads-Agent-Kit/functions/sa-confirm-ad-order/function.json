@@ -1,0 +1,58 @@
+{
+  "name": "sa-confirm-ad-order",
+  "description": "Confirms a Seek branded ad budget order (demo). Pass advertiserId from sa_idv_advertiser and adCount (2–10). Accepts advertiserId even when created in a separate IDV deployment (e.g. SA-ADV-104). Creates the order, sets status to on the way, and returns orderNumber.",
+  "handler": "handler.handler",
+  "runtime": "nodejs_22.x",
+  "input": {
+    "type": "object",
+    "properties": {
+      "advertiserId": {
+        "type": "string",
+        "title": "Advertiser ID",
+        "description": "Required. advertiserId from sa_idv_advertiser."
+      },
+      "adCount": {
+        "type": "number",
+        "title": "Number of job ads",
+        "description": "Required. Number of job ads (2–10). Selects the package tier automatically."
+      },
+      "tier": {
+        "type": "string",
+        "title": "Hiring tier",
+        "description": "Optional override. Usually omit — adCount selects the package."
+      },
+      "seekId": {
+        "type": "string",
+        "title": "Seek ID",
+        "description": "Optional fallback if advertiserId is unavailable."
+      },
+      "storePath": { "type": "string" }
+    }
+  },
+  "output": {
+    "type": "object",
+    "properties": {
+      "success": { "type": "boolean", "title": "Success" },
+      "orderNumber": { "type": "string", "title": "Order number" },
+      "orderStatus": { "type": "string", "title": "Order status" },
+      "orderStatusLabel": { "type": "string", "title": "Order status label" },
+      "tier": { "type": "string", "title": "Recommended tier" },
+      "tierLabel": { "type": "string", "title": "Tier label" },
+      "adCount": { "type": "number", "title": "Number of job ads" },
+      "adRangeDisplay": { "type": "string", "title": "Ad range" },
+      "recommendedBudgetAud": { "type": "number", "title": "Recommended budget (AUD)" },
+      "recommendedBudgetDisplay": { "type": "string", "title": "Recommended budget" },
+      "cardPriceDisplay": { "type": "string", "title": "Card price" },
+      "advertiserId": { "type": "string", "title": "Advertiser ID" },
+      "companyName": { "type": "string", "title": "Company name" },
+      "contactName": { "type": "string", "title": "Contact name" },
+      "seekId": { "type": "string", "title": "Seek ID" },
+      "summaryText": { "type": "string", "title": "Order summary" },
+      "message": { "type": "string", "title": "Message" },
+      "demoMode": { "type": "boolean", "title": "Demo mode" },
+      "details": { "type": "object", "title": "Details" },
+      "error": { "type": "string", "title": "Error" },
+      "code": { "type": "string", "title": "Error code" }
+    }
+  }
+}
